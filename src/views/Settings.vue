@@ -1,5 +1,5 @@
 <template>
-    <div id="musics">
-        Hey (settings) !
+    <div id="settings">
+        Paramètres
     </div>
 </template>

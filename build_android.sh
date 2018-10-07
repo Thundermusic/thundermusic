@@ -1,0 +1,1 @@
+node_modules/.bin/vue-cli-service build --mode production --dest thundermusic-android/app/src/main/assets/www

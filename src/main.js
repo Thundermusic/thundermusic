@@ -1,6 +1,6 @@
 import '@babel/polyfill';
 import Vue from 'vue';
-import './plugins/vuetify';
+import './vuetify';
 
 import App from './App.vue';
 
@@ -11,6 +11,16 @@ import router from './router';
 import store from './store';
 
 Vue.config.productionTip = false;
+Vue.prototype.$api = 'https://api.thundermusic.litarvan.com/';
+
+import { VirtualScroller, RecycleList } from 'vue-virtual-scroller'
+import VueVirtualScroller from 'vue-virtual-scroller';
+
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
+Vue.use(VueVirtualScroller);
+Vue.component('virtual-scroller', VirtualScroller);
+Vue.component('recycle-list', RecycleList);
 
 new Vue({
     render: h => h(App),

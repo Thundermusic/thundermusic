@@ -3,17 +3,13 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-    state: {
-    }
-});
+const cordova = window.cordova;
 
-/*
 export default new Vuex.Store({
     state: {
         initialized: false,
         musics: [],
-        current: null,
+        current: { title: 'Aucune musique', artist: 'Personne' },
         paused: false,
         position: 0,
         duration: 0
@@ -60,7 +56,6 @@ export default new Vuex.Store({
                                         commit('push', obj.songs);
                                         break;
                                     case 'play':
-                                        console.log('ah ! on change de song');
                                         commit('setPaused', false);
                                         commit('setCurrent', obj.song);
                                         break;
@@ -73,11 +68,11 @@ export default new Vuex.Store({
                                 }
 
                                 listen();
-                            }, _ => {}, 'Thundermusic', 'listen');
+                            }, () => {}, 'Thundermusic', 'listen');
                         }
                         listen();
 
-                        cordova.exec(_ => {
+                        cordova.exec(() => {
                             setInterval(() => {
                                 cordova.exec(obj => {
                                     const pos = obj.position;
@@ -86,7 +81,7 @@ export default new Vuex.Store({
                                     if (pos !== -1 && (Math.abs(state.current.durationValue - pos) > 0.6 || state.current.durationMax !== dur)) {
                                         commit('setPosition', { pos, dur });
                                     }
-                                }, _ => {}, 'Thundermusic', 'position');
+                                }, () => {}, 'Thundermusic', 'position');
                             }, 500);
 
                             commit('setInitialized');
@@ -97,40 +92,39 @@ export default new Vuex.Store({
             });
         },
 
-        play({}, music)
+        play(_, music)
         {
             cordova.exec(null, null, 'Thundermusic', 'play', [music]);
         },
 
         pause()
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'pause');
+            cordova.exec(null, null, 'Thundermusic', 'pause');
         },
 
         previous()
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'previous');
+            cordova.exec(null, null, 'Thundermusic', 'previous');
         },
 
         next()
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'next');
+            cordova.exec(null, null, 'Thundermusic', 'next');
         },
 
-        seek({}, position)
+        seek(_, position)
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'seek', [position]);
+            cordova.exec(null, null, 'Thundermusic', 'seek', [position]);
         },
 
-        update({}, song)
+        update(_, song)
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'update', [song]);
+            cordova.exec(null, null, 'Thundermusic', 'update', [song]);
         },
 
-        remove({}, song)
+        remove(_, song)
         {
-            cordova.exec(_ => {}, _ => {}, 'Thundermusic', 'remove', [song]);
+            cordova.exec(null, null, 'Thundermusic', 'remove', [song]);
         }
     }
 });
- */

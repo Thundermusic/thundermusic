@@ -1,5 +1,5 @@
 <template>
-    <div id="musics">
-        Hey (playlists) !
+    <div id="playlists">
+        Playlists
     </div>
 </template>
