@@ -192,7 +192,13 @@ public class Thundermusic extends CordovaPlugin
 
     protected void send(int message, Bundle data)
     {
-        Message msg = Message.obtain(null, message, 0, 0);
+        /*String song = "";
+        if (data != null) {
+            song = data.getString("song");
+            System.out.println("data : " + song);
+        }*/
+
+        Message msg = Message.obtain(null, message, 0, 0/*, song*/);
         if (data != null)
         {
             msg.setData(data);

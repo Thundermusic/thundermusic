@@ -63,7 +63,7 @@
     }
 
     .music-title, .music-artist {
-        max-width: calc(100% - 175px);
+        max-width: 100%;
     }
 
     .thumbnail {

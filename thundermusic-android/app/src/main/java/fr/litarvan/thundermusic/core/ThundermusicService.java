@@ -53,6 +53,8 @@ public class ThundermusicService extends Service
         @Override
         public void handleMessage(Message msg)
         {
+            Message cpy = Message.obtain(msg); // Needed
+
             switch (msg.what)
             {
                 case MSG_INIT:
@@ -70,7 +72,7 @@ public class ThundermusicService extends Service
                     break;
                 case MSG_DOWNLOAD:
                     try {
-                        downloadManager.download(SongToDownload.fromJSON(new JSONObject(msg.getData().getString("song"))));
+                        downloadManager.download(SongToDownload.fromJSON(new JSONObject(cpy.getData().getString("song"))));
                     } catch (JSONException e) {
                         Log.e("Thundermusic", "Error while parsing song infos", e);
                         error("Error while parsing song infos : " + e.getMessage());
@@ -84,7 +86,9 @@ public class ThundermusicService extends Service
                         public void run()
                         {
                             try {
-                                player.play(Song.fromJSON(new JSONObject(msg.getData().getString("song"))));
+                                player.play(Song.fromJSON(new JSONObject(cpy.getData().getString("song"))));
+                                System.out.println("Obj : " + cpy.getData().getString("song"));
+                                //player.play(Song.fromJSON(new JSONObject((String) cpy.obj)));
                             } catch (JSONException | IOException e) {
                                 Log.e("Thundermusic", "Error while parsing song infos", e);
                                 error("Error while parsing song infos : " + e.getMessage());

@@ -2,3 +2,4 @@
 node_modules/
 dist/
 .idea/
+thundermusic-android/app/src/main/assets/www/*

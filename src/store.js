@@ -63,11 +63,8 @@ export default new Vuex.Store({
                                         commit('setPaused', obj.paused);
                                         break;
                                     case 'position':
-                                        const pos = obj.position;
-                                        const dur = obj.duration;
-
-                                        if (pos !== -1 && (Math.abs(state.current.durationValue - pos) > 0.6 || state.current.durationMax !== dur)) {
-                                            commit('setPosition', { pos, dur });
+                                        if (obj.position !== -1 && (Math.abs(state.current.durationValue - obj.position) > 0.6 || state.current.durationMax !== obj.duration)) {
+                                            commit('setPosition', { pos: obj.position, dur: obj.duration });
                                         }
                                         break;
                                     case 'download':
