@@ -62,6 +62,14 @@ export default new Vuex.Store({
                                     case 'pause':
                                         commit('setPaused', obj.paused);
                                         break;
+                                    case 'position':
+                                        const pos = obj.position;
+                                        const dur = obj.duration;
+
+                                        if (pos !== -1 && (Math.abs(state.current.durationValue - pos) > 0.6 || state.current.durationMax !== dur)) {
+                                            commit('setPosition', { pos, dur });
+                                        }
+                                        break;
                                     case 'download':
                                         // obj.song & obj.value (converted, progress, finished) (obj.param)
                                         break;
@@ -73,17 +81,7 @@ export default new Vuex.Store({
                         listen();
 
                         cordova.exec(() => {
-                            setInterval(() => {
-                                cordova.exec(obj => {
-                                    const pos = obj.position;
-                                    const dur = obj.duration;
-
-                                    if (pos !== -1 && (Math.abs(state.current.durationValue - pos) > 0.6 || state.current.durationMax !== dur)) {
-                                        commit('setPosition', { pos, dur });
-                                    }
-                                }, () => {}, 'Thundermusic', 'position');
-                            }, 500);
-
+                            setInterval(() => cordova.exec(() => {}, () => {}, 'Thundermusic', 'position'), 500);
                             commit('setInitialized');
                             resolve();
                         }, reject, 'Thundermusic', 'init');

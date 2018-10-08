@@ -1,14 +1,14 @@
 package fr.litarvan.thundermusic.core;
 
-import java.io.IOException;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.os.ResultReceiver;
 import android.util.Log;
 import fr.litarvan.thundermusic.core.EventManager.EventListener;
@@ -26,11 +26,10 @@ public class Thundermusic extends CordovaPlugin
     public static final String API_URL = "https://api.thundermusic.litarvan.com/";
 
     private Messenger playerMessenger;
-
     private EventManager eventManager;
-    private MusicManager musicManager;
-    private MusicPlayer player;
-    private DownloadManager downloadManager;
+    private CallbackContext initCallback;
+
+    private Runnable onConnected;
 
     private ServiceConnection playerConnection = new ServiceConnection()
     {
@@ -38,6 +37,10 @@ public class Thundermusic extends CordovaPlugin
         public void onServiceConnected(ComponentName componentName, IBinder iBinder)
         {
             playerMessenger = new Messenger(iBinder);
+
+            if (onConnected != null) {
+                onConnected.run();
+            }
         }
 
         @Override
@@ -60,45 +63,82 @@ public class Thundermusic extends CordovaPlugin
 
     protected void init()
     {
-        musicManager = new MusicManager(webView.getContext(), eventManager);
-        player = new MusicPlayer(this, webView.getContext(), eventManager, musicManager);
-        downloadManager = new DownloadManager(webView.getContext(), musicManager, eventManager);
-
-        musicManager.setPlayer(player);
-
-        try {
-            musicManager.load();
-        } catch (Exception e) {
-            Log.e("Thundermusic", "Error while reading songs", e);
-            eventManager.error("Error while reading songs : " + e.getMessage());
-        }
-
-        Intent intent = new Intent(webView.getContext(), MediaPlayerService.class);
+        Intent intent = new Intent(webView.getContext(), ThundermusicService.class);
         intent.putExtra("receiver", new ResultReceiver(null)
         {
             @Override
             protected void onReceiveResult(int resultCode, Bundle resultData)
             {
-                System.out.println("IL A DIT : " + resultCode);
+                JSONObject result = new JSONObject();
+
+                switch (resultCode)
+                {
+                    case ThundermusicService.RSP_INITIALIZED:
+                        initCallback.success();
+                        break;
+                    case ThundermusicService.RSP_ERROR:
+                        String error = resultData.getString("error");
+
+                        Log.e("Thundermusic", "Error from service : " + error);
+                        eventManager.error(error);
+                        break;
+                    case ThundermusicService.RSP_POSITION:
+                        try
+                        {
+                            result.put("type", "position");
+                            result.put("position", resultData.getInt("position"));
+                            result.put("duration", resultData.getInt("duration"));
+
+                            eventManager.emit(result);
+                        }
+                        catch (JSONException e)
+                        {
+                            Log.e("Thundermusic", "Error while sending position event", e);
+                            eventManager.error("Error while sending position event : " + e.getMessage());
+                        }
+
+                        break;
+                    case ThundermusicService.RSP_EVENT:
+                        try
+                        {
+                            eventManager.emit(new JSONObject(resultData.getString("event")));
+                        }
+                        catch (JSONException e)
+                        {
+                            Log.e("Thundermusic", "Error while sending event", e);
+                            eventManager.error("Error while sending event : " + e.getMessage());
+                        }
+
+                        break;
+                }
             }
         });
         webView.getContext().bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
+
+        if (playerMessenger != null) {
+            send(ThundermusicService.MSG_INIT, null);
+        } else {
+            onConnected = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    send(ThundermusicService.MSG_INIT, null);
+                }
+            };
+        }
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException
     {
-        switch (action) {
+        Bundle bundle = new Bundle();
+
+        switch (action)
+        {
             case "init":
-                cordova.getThreadPool().execute(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        init();
-                        callbackContext.success("OK");
-                    }
-                });
+                initCallback = callbackContext;
+                init();
                 return true;
             case "listen":
                 eventManager.listen(new EventListener()
@@ -111,72 +151,36 @@ public class Thundermusic extends CordovaPlugin
                 });
                 return true;
             case "download":
-                try {
-                    downloadManager.download(SongToDownload.fromJSON(args.getJSONObject(0)));
-                } catch (JSONException e) {
-                    Log.e("Thundermusic", "Error while parsing song infos", e);
-                    eventManager.error("Error while parsing song infos : " + e.getMessage());
-                }
+                bundle.putString("song", args.getJSONObject(0).toString());
+                send(ThundermusicService.MSG_DOWNLOAD, bundle);
                 break;
             case "play":
-                cordova.getThreadPool().execute(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try {
-                            player.play(Song.fromJSON(args.getJSONObject(0)));
-                        } catch (JSONException | IOException e) {
-                            Log.e("Thundermusic", "Error while parsing song infos", e);
-                            eventManager.error("Error while parsing song infos : " + e.getMessage());
-                        }
-                    }
-                });
+                bundle.putString("song", args.getJSONObject(0).toString());
+                send(ThundermusicService.MSG_PLAY, bundle);
                 break;
             case "pause":
-                player.pause();
+                send(ThundermusicService.MSG_PAUSE, null);
                 break;
             case "next":
-                try {
-                    player.next();
-                } catch (IOException e) {
-                    Log.e("Thundermusic", "Error while reading next song", e);
-                    eventManager.error("Error while reading next song : " + e.getMessage());
-                }
+                send(ThundermusicService.MSG_NEXT, null);
                 break;
             case "previous":
-                try {
-                    player.previous();
-                } catch (IOException e) {
-                    Log.e("Thundermusic", "Error while reading previous song", e);
-                    eventManager.error("Error while reading previous song : " + e.getMessage());
-                }
+                send(ThundermusicService.MSG_PREVIOUS, null);
                 break;
             case "seek":
-                player.seek(args.getInt(0));
+                bundle.putInt("position", args.getInt(0));
+                send(ThundermusicService.MSG_SEEK, bundle);
                 break;
             case "update":
-                try {
-                    musicManager.update(Song.fromJSON(args.getJSONObject(0)));
-                } catch (Exception e) {
-                    Log.e("Thundermusic", "Error while parsing song infos", e);
-                    eventManager.error("Error while parsing song infos : " + e.getMessage());
-                }
+                bundle.putString("song", args.getJSONObject(0).toString());
+                send(ThundermusicService.MSG_UPDATE, bundle);
                 break;
             case "remove":
-                try {
-                    musicManager.remove(Song.fromJSON(args.getJSONObject(0)));
-                } catch (Exception e) {
-                    Log.e("Thundermusic", "Error while parsing song infos", e);
-                    eventManager.error("Error while parsing song infos : " + e.getMessage());
-                }
+                bundle.putString("song", args.getJSONObject(0).toString());
+                send(ThundermusicService.MSG_REMOVE, bundle);
                 break;
             case "position":
-                JSONObject object = new JSONObject();
-                object.put("position", player.getPosition());
-                object.put("duration", player.getDuration());
-
-                callbackContext.success(object);
+                send(ThundermusicService.MSG_POSITION, null);
                 return true;
             default:
                 return false;
@@ -186,9 +190,23 @@ public class Thundermusic extends CordovaPlugin
         return true;
     }
 
-    public Messenger getPlayerMessenger()
+    protected void send(int message, Bundle data)
     {
-        return playerMessenger;
+        Message msg = Message.obtain(null, message, 0, 0);
+        if (data != null)
+        {
+            msg.setData(data);
+        }
+
+        try
+        {
+            playerMessenger.send(msg);
+        }
+        catch (RemoteException e)
+        {
+            Log.e("Thundermusic", "Error while sending message to service", e);
+            eventManager.error("Error while sending message to service : " + e.getMessage());
+        }
     }
 
     @Override

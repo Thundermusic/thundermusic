@@ -1,5 +1,7 @@
 <template>
     <div id="search">
+        <Loading :isLoading="searching" />
+
         <v-form @submit.prevent="search">
             <v-text-field solo :readonly="searching" v-model="query" autofocus autocapitalize="off" autocomplete="off" spellcheck="false" autocorrect="off" placeholder="Rechercher..." append-icon="search" />
         </v-form>
@@ -10,10 +12,11 @@
 
 <script>
     import MusicList from '../components/MusicList';
+    import Loading from "../components/Loading";
 
     export default {
         name: 'search',
-        components: { MusicList },
+        components: {Loading, MusicList },
 
         data() {
             return {
@@ -24,6 +27,7 @@
         },
         methods: {
             search() {
+                this.results = [];
                 this.searching = true;
 
                 fetch(`${this.$api}search?query=${encodeURIComponent(this.query)}`)

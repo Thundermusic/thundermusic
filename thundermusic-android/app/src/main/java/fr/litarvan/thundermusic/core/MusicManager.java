@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.ResultReceiver;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -29,17 +31,17 @@ import org.json.JSONObject;
 public class MusicManager
 {
     private Context context;
-    private EventManager eventManager;
+    private ResultReceiver resultReceiver;
     private MusicPlayer player;
 
     private File songFolder;
     private File cacheFile;
     private List<Song> songs;
 
-    public MusicManager(Context context, EventManager eventManager)
+    public MusicManager(Context context, ResultReceiver resultReceiver)
     {
         this.context = context;
-        this.eventManager = eventManager;
+        this.resultReceiver = resultReceiver;
     }
 
     public void load() throws Exception
@@ -154,12 +156,15 @@ public class MusicManager
         File thumb = File.createTempFile("thumb-" + song.getId() + "-", ".png", context.getCacheDir());
         AudioFile audio = AudioFileIO.read(song.getFile());
 
-        try (FileOutputStream out = new FileOutputStream(thumb))
-        {
-            out.write(audio.getTag().getFirstArtwork().getBinaryData());
-        }
+        Artwork artwork = audio.getTag().getFirstArtwork();
 
-        song.setImage(thumb);
+        if (artwork != null) {
+            try (FileOutputStream out = new FileOutputStream(thumb)) {
+                out.write(artwork.getBinaryData());
+            }
+
+            song.setImage(thumb);
+        }
     }
 
     protected void writeTags(Song song, byte[] thumbnail) throws Exception
@@ -213,7 +218,10 @@ public class MusicManager
         event.put("type", "update");
         event.put("songs", array);
 
-        eventManager.emit(event);
+        Bundle bundle = new Bundle();
+        bundle.putString("event", event.toString());
+
+        resultReceiver.send(ThundermusicService.RSP_EVENT, bundle);
     }
 
     public void setPlayer(MusicPlayer player)

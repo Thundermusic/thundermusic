@@ -1,8 +1,7 @@
 <template>
     <div class="music-list">
-        <div class="loading" v-if="!initialized">
-            <v-progress-circular indeterminate color="primary" :size="50" :width="5"></v-progress-circular>
-        </div>
+        <Loading :isLoading="!initialized" />
+
         <v-list class="list" two-line>
             <!--<template v-for="(music, index) in content">-->
             <recycle-list :items="content" :item-height="72" page-mode v-if="initialized">
@@ -13,7 +12,7 @@
                         </v-list-tile-avatar>
                         <v-list-tile-content>
                             <v-list-tile-title class="music-title">{{ music.title }}</v-list-tile-title>
-                            <v-list-tile-sub-title class="text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
+                            <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
                             <v-list-tile-sub-title>(3:21)</v-list-tile-sub-title>
                         </v-list-tile-content>
                         <v-list-tile-action v-if="sideButtons">
@@ -30,8 +29,10 @@
 </template>
 
 <script>
+    import Loading from "./Loading";
     export default {
         name: 'music-list',
+        components: {Loading},
         props: ['content', 'sideButtons', 'canPlay'],
 
         methods: {
@@ -57,14 +58,12 @@
         padding-top: 4px;
     }
 
-    .loading {
-        position: absolute;
-        top: calc(50vh - 60px);
-        left: calc(50% - 25px);
-    }
-
     .music-title {
         font-weight: 500;
+    }
+
+    .music-title, .music-artist {
+        max-width: calc(100% - 175px);
     }
 
     .thumbnail {

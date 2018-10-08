@@ -7,16 +7,17 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.ResultReceiver;
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MusicPlayer implements OnPreparedListener, OnCompletionListener
 {
-    private Thundermusic thundermusic;
     private Context context;
-    private EventManager eventManager;
+    private ResultReceiver resultReceiver;
     private MediaPlayer mediaPlayer;
     private MusicManager musicManager;
 
@@ -24,11 +25,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
     private boolean paused;
     private boolean askedPlay = false;
 
-    public MusicPlayer(Thundermusic thundermusic, Context context, EventManager eventManager, MusicManager musicManager)
+    public MusicPlayer(Context context, ResultReceiver resultReceiver, MusicManager musicManager)
     {
-        this.thundermusic = thundermusic;
         this.context = context;
-        this.eventManager = eventManager;
+        this.resultReceiver = resultReceiver;
         this.mediaPlayer = new MediaPlayer();
         this.musicManager = musicManager;
         this.mediaPlayer.setOnPreparedListener(this);
@@ -66,10 +66,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
             object.put("type", "pause");
             object.put("paused", paused);
 
-            eventManager.emit(object);
+            Bundle bundle = new Bundle();
+            bundle.putString("event", object.toString());
+
+            resultReceiver.send(ThundermusicService.RSP_EVENT, bundle);
         } catch (JSONException e) {
-            Log.e("TM-MusicPlayer", "Error while sending pause event", e);
-            eventManager.error("Error while sending pause event : " + e.getMessage());
+            Bundle bundle = new Bundle();
+            bundle.putString("error", "Error while sending pause event : " + e.getMessage());
+
+            resultReceiver.send(ThundermusicService.RSP_ERROR, bundle);
         }
     }
 
@@ -153,10 +158,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
             object.put("type", "play");
             object.put("song", current.toJSON());
 
-            eventManager.emit(object);
+            Bundle bundle = new Bundle();
+            bundle.putString("event", object.toString());
+
+            resultReceiver.send(ThundermusicService.RSP_EVENT, bundle);
         } catch (JSONException e) {
-            Log.e("TM-MusicPlayer", "Error while sending play event", e);
-            eventManager.error("Error while sending player event : " + e.getMessage());
+            Bundle bundle = new Bundle();
+            bundle.putString("error", "Error while sending play event : " + e.getMessage());
+
+            resultReceiver.send(ThundermusicService.RSP_ERROR, bundle);
         }
     }
 
