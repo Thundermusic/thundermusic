@@ -189,7 +189,8 @@ public class MusicManager
             byte[] image = tags.getAlbumImage();
 
             if (image != null) {
-                File thumb = File.createTempFile("thumb-" + song.getId() + "-", "." + tags.getAlbumImageMimeType(), context.getCacheDir());
+                String mime = tags.getAlbumImageMimeType();
+                File thumb = File.createTempFile("thumb-" + song.getId() + "-", "." + mime.substring(mime.lastIndexOf("/") + 1), context.getCacheDir());
 
                 try (FileOutputStream out = new FileOutputStream(thumb)) {
                     out.write(image);
