@@ -54,11 +54,13 @@ public class Song
 
     public static Song fromJSON(JSONObject song) throws JSONException
     {
+        File image = song.has("image") ? new File(song.getString("image")) : null;
+
         return new Song(
             song.getString("id"),
             song.getString("title"),
             song.getString("artist"),
-            new File(song.getString("image")),
+            image,
             new File(song.getString("file"))
         );
     }
@@ -70,7 +72,11 @@ public class Song
         result.put("id", id);
         result.put("title", title);
         result.put("artist", artist);
-        result.put("image", image.getAbsolutePath());
+
+        if (image != null) {
+            result.put("image", image.getAbsolutePath());
+        }
+
         result.put("file", file.getAbsolutePath());
 
         return result;

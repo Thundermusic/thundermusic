@@ -17,6 +17,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ResultReceiver;
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.ID3v24Tag;
+import com.mpatric.mp3agic.Mp3File;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -61,9 +64,11 @@ public class MusicManager
                     result.append(line);
                 }
 
-                JSONArray songs = new JSONArray(result.toString());
-                for (int i = 0; i < songs.length(); i++) {
-                    this.songs.add(Song.fromJSON(songs.getJSONObject(i)));
+                if (result.length() != 0) {
+                    JSONArray songs = new JSONArray(result.toString());
+                    for (int i = 0; i < songs.length(); i++) {
+                        this.songs.add(Song.fromJSON(songs.getJSONObject(i)));
+                    }
                 }
             }
         }
@@ -83,18 +88,29 @@ public class MusicManager
             }
 
             if (original == null) {
-                AudioFile audio = AudioFileIO.read(file);
-                Tag tags = audio.getTag();
+                /*AudioFile audio = AudioFileIO.read(file);
+                Tag tags = audio.getTag();*/
+                Mp3File audio = new Mp3File(file);
+                String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
+                String artist = "Artiste inconnu";
+
+                if (audio.hasId3v2Tag()) {
+                    ID3v2 tags = audio.getId3v2Tag();
+                    title = tags.getTitle();
+                    artist = tags.getArtist();
+                }
 
                 Song song = create(new SongToDownload(
                     UUID.randomUUID().toString().substring(0, 10),
-                    tags.getFirst(FieldKey.TITLE),
-                    tags.getFirst(FieldKey.ARTIST),
+                    /*tags.getFirst(FieldKey.TITLE),
+                    tags.getFirst(FieldKey.ARTIST),*/
+                    title,
+                    artist,
                     null
                 ), file, null, false);
 
                 updateThumb(song);
-            } else if (!original.getImage().exists()) {
+            } else if (original.getImage() != null && !original.getImage().exists()) {
                 updateThumb(original);
             }
         }
@@ -122,6 +138,7 @@ public class MusicManager
 
         songs.add(song);
 
+        System.out.println("On va write les tags, thumb de " + (thumbnail == null ? "null" : thumbnail.length));
         writeTags(song, thumbnail);
         updateThumb(song);
 
@@ -153,23 +170,62 @@ public class MusicManager
 
     protected void updateThumb(Song song) throws Exception
     {
-        File thumb = File.createTempFile("thumb-" + song.getId() + "-", ".png", context.getCacheDir());
-        AudioFile audio = AudioFileIO.read(song.getFile());
+        /*AudioFile audio = AudioFileIO.read(song.getFile());
 
         Artwork artwork = audio.getTag().getFirstArtwork();
-
+        System.out.println("Artwork ? " + artwork);
         if (artwork != null) {
             try (FileOutputStream out = new FileOutputStream(thumb)) {
                 out.write(artwork.getBinaryData());
             }
 
+            System.out.println("Bon bah settons ! " + thumb.getAbsolutePath());
             song.setImage(thumb);
+        }*/
+
+        Mp3File file = new Mp3File(song.getFile());
+        if (file.hasId3v2Tag()) {
+            ID3v2 tags = file.getId3v2Tag();
+            byte[] image = tags.getAlbumImage();
+
+            if (image != null) {
+                File thumb = File.createTempFile("thumb-" + song.getId() + "-", "." + tags.getAlbumImageMimeType(), context.getCacheDir());
+
+                try (FileOutputStream out = new FileOutputStream(thumb)) {
+                    out.write(image);
+                }
+
+                System.out.println("Bon bah settons ! " + thumb.getAbsolutePath());
+                song.setImage(thumb);
+            }
         }
     }
 
     protected void writeTags(Song song, byte[] thumbnail) throws Exception
     {
-        AudioFile audio = AudioFileIO.read(song.getFile());
+        File oldFile = new File(song.getFile().getAbsolutePath() + ".old");
+        File newFile = new File(song.getFile().getAbsolutePath());
+
+        song.getFile().renameTo(oldFile);
+
+        Mp3File file = new Mp3File(oldFile);
+        ID3v2 tags = file.hasId3v2Tag() ? file.getId3v2Tag() : new ID3v24Tag();
+
+        tags.setComment(song.getId());
+        tags.setTitle(song.getArtist());
+        tags.setArtist(song.getArtist());
+
+        if (thumbnail != null) {
+            System.out.println("Artwork ecrit");
+            tags.setAlbumImage(thumbnail, "image/jpeg");
+        }
+
+        file.setId3v2Tag(tags);
+        file.save(newFile.getAbsolutePath());
+
+        oldFile.delete();
+
+        /*AudioFile audio = AudioFileIO.read(song.getFile());
         Tag tags = audio.getTag();
 
         tags.setField(FieldKey.CUSTOM1, song.getId());
@@ -177,6 +233,7 @@ public class MusicManager
         tags.setField(FieldKey.TITLE, song.getTitle());
 
         if (thumbnail != null) {
+            System.out.println("Lets go on la write, evidemment mime type : " + ImageFormats.getMimeTypeForBinarySignature(thumbnail));
             Artwork artwork = new AndroidArtwork();
             artwork.setBinaryData(thumbnail);
             artwork.setMimeType(ImageFormats.getMimeTypeForBinarySignature(thumbnail));
@@ -186,7 +243,10 @@ public class MusicManager
             tags.getArtworkList().add(artwork);
         }
 
-        audio.commit();
+        audio.setTag(tags);
+        audio.commit();*/
+
+        System.out.println("Cest ecrit");
     }
 
     protected void updateCache() throws Exception
@@ -212,7 +272,7 @@ public class MusicManager
         JSONArray array = new JSONArray();
 
         for (Song song : this.songs) {
-            array.put(song.toJSON()); // TODO: Check this
+            array.put(song.toJSON());
         }
 
         event.put("type", "update");

@@ -1,103 +1,200 @@
 package fr.litarvan.thundermusic.core;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DownloadManager
 {
-    private Context context;
+    private Context context; // TODO: Delete ?
     private MusicManager musicManager;
-    private EventManager eventManager;
+    private ResultReceiver receiver;
     private BlockingQueue<SongToDownload> queue;
+    private List<SongToDownload> downloads;
 
-    public DownloadManager(Context context, MusicManager musicManager, EventManager eventManager)
+    public DownloadManager(Context context, MusicManager musicManager, ResultReceiver receiver)
     {
         this.context = context;
         this.musicManager = musicManager;
-        this.eventManager = eventManager;
+        this.receiver = receiver;
         this.queue = new LinkedBlockingQueue<>();
-    }
-
-    public void start()
-    {
-        while (true) {
-            SongToDownload song = this.queue.poll();
-            download(this.context, song);
-        }
+        this.downloads = new ArrayList<>();
     }
 
     public void download(SongToDownload song)
     {
+        System.out.println("Oui on a recu : " + song.getTitle());
         this.queue.offer(song);
+        this.downloads.add(song);
     }
 
-    protected void download(Context context, SongToDownload song)
+    public void start()
     {
-        Intent intent = new Intent(context, DownloadService.class);
-        intent.putExtra("id", song.getId());
-        intent.putExtra("output", musicManager.getFile(song));
-        intent.putExtra("receiver", new ResultReceiver(new Handler()) {
+        Thread t = new Thread() {
             @Override
-            protected void onReceiveResult(int resultCode, Bundle resultData)
+            public void run()
             {
-                super.onReceiveResult(resultCode, resultData);
-
-                switch (resultCode)
-                {
-                    case DownloadService.CONVERTED:
-                        sendEvent(song.getId(), "converted", null);
+                while (true) {
+                    System.out.println("On poll...");
+                    SongToDownload song;
+                    try {
+                        song = queue.poll(Integer.MAX_VALUE, TimeUnit.DAYS);
+                    } catch (InterruptedException e) {
                         break;
-                    case DownloadService.DOWNLOAD_PROGRESS:
-                        sendEvent(song.getId(), "progress", String.valueOf(resultData.getInt("progress")));
-                        break;
-                    case DownloadService.FINISHED:
-                        boolean ok = false;
+                    }
+                    System.out.println("OK lets go : " + song.getTitle());
 
-                        try {
-                            musicManager.create(song, new File(resultData.getString("output")), resultData.getByteArray("thumbnail"), true);
-                            ok = true;
-                        } catch (Exception e) {
-                            Log.e("Thundermusic", "Error while downloading song", e);
-                            eventManager.error("Error while downloading song : " + e.getMessage());
+                    File output = musicManager.getFile(song);
+
+                    song.setProgress(-1);
+                    update();
+
+                    try {
+                        download(Thundermusic.API_URL + "convert?query=" + URLEncoder.encode("https://www.youtube.com/watch?v=" + song.getId()), null, null, true);
+                    } catch (IOException e) {
+                        error("Error while converting song", e);
+                        return;
+                    }
+
+                    song.setProgress(0);
+                    update();
+
+                    try {
+                        download(Thundermusic.API_URL + "download?id=" + song.getId(), new FileOutputStream(output), song, false);
+                    } catch (IOException e) {
+                        error("Error while downloading song", e);
+                        return;
+                    }
+
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    try {
+                        download(song.getThumbnail(), out, null, false);
+                    } catch (IOException e) {
+                        error("Error while downloading song thumbnail", e);
+                        return;
+                    }
+
+                    byte[] thumbnail = out.toByteArray();
+                    try {
+                        out.close();
+                    } catch (IOException ignored) { }
+
+                    System.out.println("Bon bah on add");
+                    try {
+                        musicManager.create(song, output, thumbnail, true);
+                    } catch (Exception e) {
+                        error("Error while adding song", e);
+                    }
+
+                    System.out.println("Eh bah voila");
+                    SongToDownload[] songs = downloads.toArray(new SongToDownload[0]);
+                    for (int i = 0; i < songs.length; i++)
+                    {
+                        if (songs[i] == song)
+                        {
+                            downloads.remove(i);
+                            update();
+                            break;
                         }
-
-                        sendEvent(song.getId(), "finished", String.valueOf(ok));
-                        break;
-                    case DownloadService.ERROR:
-                        eventManager.error(resultData.getString("message"));
-                        break;
+                    }
                 }
             }
-        });
-        context.startService(intent);
+        };
+        t.start();
     }
 
-    protected void sendEvent(String song, String event, String param)
+    protected void download(String urlStr, OutputStream output, SongToDownload song, boolean post) throws IOException
     {
-        JSONObject result = new JSONObject();
-
-        try {
-            result.put("type", "download");
-            result.put("song", song);
-            result.put("value", event);
-
-            if (param != null) {
-                result.put("param", param);
-            }
-        } catch (JSONException e) {
-            Log.e("TM-DownloadManager", "Error while creating JSON event", e);
+        URL url = new URL(urlStr);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        if (post) {
+            connection.setRequestMethod("POST");
         }
 
-        eventManager.emit(result);
+        connection.connect();
+
+        int fileLength = connection.getContentLength();
+        System.out.println("URL : " + urlStr);
+        System.out.println("File length : " + fileLength);
+
+        InputStream input = new BufferedInputStream(connection.getInputStream());
+
+        int lastProgress = 0;
+
+        byte data[] = new byte[1024];
+        long total = 0;
+        int count;
+
+        while ((count = input.read(data)) != -1) {
+            total += count;
+
+            if (song != null) {
+                int progress = (int) (total * 100 / fileLength);
+                if (progress - lastProgress >= 10) {
+                    song.setProgress(progress);
+                    update();
+
+                    lastProgress = progress;
+                }
+            }
+
+            if (output != null) {
+                output.write(data, 0, count);
+            }
+        }
+
+        if (output != null) {
+            output.flush();
+            output.close();
+        }
+
+        input.close();
+    }
+
+    protected void error(String message, Exception error)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putString("error", message + " : " + error.getMessage());
+
+        receiver.send(ThundermusicService.RSP_ERROR, bundle);
+        Log.e("TM-DownloadManager", "Error while downloading", error);
+    }
+
+    protected void update()
+    {
+        Bundle bundle = new Bundle();
+        JSONArray array = new JSONArray();
+        SongToDownload[] songs = downloads.toArray(new SongToDownload[0]);
+
+        try {
+            for (int i = 0; i < songs.length; i++) {
+                array.put(i, songs[i].toJSON());
+            }
+        } catch (JSONException e) {
+            error("Error while writing JSON", e);
+        }
+
+        bundle.putString("downloads", array.toString());
+        receiver.send(ThundermusicService.RSP_DOWNLOADS, bundle);
     }
 }

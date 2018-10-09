@@ -83,30 +83,39 @@ public class Thundermusic extends CordovaPlugin
                         eventManager.error(error);
                         break;
                     case ThundermusicService.RSP_POSITION:
-                        try
-                        {
+                        try {
                             result.put("type", "position");
                             result.put("position", resultData.getInt("position"));
                             result.put("duration", resultData.getInt("duration"));
 
                             eventManager.emit(result);
-                        }
-                        catch (JSONException e)
-                        {
+                        } catch (JSONException e) {
                             Log.e("Thundermusic", "Error while sending position event", e);
                             eventManager.error("Error while sending position event : " + e.getMessage());
                         }
 
                         break;
                     case ThundermusicService.RSP_EVENT:
-                        try
-                        {
+                        try {
                             eventManager.emit(new JSONObject(resultData.getString("event")));
-                        }
-                        catch (JSONException e)
-                        {
+                        } catch (JSONException e) {
                             Log.e("Thundermusic", "Error while sending event", e);
                             eventManager.error("Error while sending event : " + e.getMessage());
+                        }
+
+                        break;
+                    case ThundermusicService.RSP_DOWNLOADS:
+                        try {
+                            JSONArray songs = new JSONArray(resultData.getString("downloads"));
+                            JSONObject event = new JSONObject();
+                            event.put("type", "downloads");
+                            event.put("downloads", songs);
+
+                            System.out.println("On part sur une emission de : " + songs.toString());
+                            eventManager.emit(event);
+                        } catch (JSONException e) {
+                            Log.e("Thundermusic", "Error while sending downloads event", e);
+                            eventManager.error("Error while sending downloads event : " + e.getMessage());
                         }
 
                         break;
@@ -151,6 +160,7 @@ public class Thundermusic extends CordovaPlugin
                 });
                 return true;
             case "download":
+                System.out.println("On send le download");
                 bundle.putString("song", args.getJSONObject(0).toString());
                 send(ThundermusicService.MSG_DOWNLOAD, bundle);
                 break;

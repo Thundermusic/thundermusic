@@ -5,10 +5,54 @@ Vue.use(Vuex);
 
 const cordova = window.cordova;
 
+function extract(videoTitle, channel) {
+    const video = videoTitle.trim().replace(/(\(|\[)(?!(ft|feat)).*(\)|\])/g, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[^\[\(]((ft|feat)\..*)/g, (_, r) => ` (${r})`);
+
+    let title = null;
+    let artist = null;
+
+    const splitChars = ['-', '–', ':'];
+    for (const c of splitChars)
+    {
+        if (video.indexOf(c) > 0) {
+            const split = video.split(c);
+
+            title = split[1];
+            artist = split[0];
+
+            let result = '';
+
+            for (const c of artist.split(' '))
+            {
+                result += c.charAt(0).toUpperCase() + c.substring(1) + ' ';
+            }
+
+            artist = result.substring(0, result.length - 1);
+
+            break;
+        }
+    }
+
+    if (title === null)
+    {
+        title = videoTitle;
+    }
+
+    if (artist === null)
+    {
+        artist = channel;
+    }
+
+    return { title, artist };
+}
+
 export default new Vuex.Store({
     state: {
         initialized: false,
         musics: [],
+        downloads: [],
         current: { title: 'Aucune musique', artist: 'Personne' },
         paused: false,
         position: 0,
@@ -23,6 +67,11 @@ export default new Vuex.Store({
         push(state, musics)
         {
             state.musics = musics;
+        },
+
+        pushDownloads(state, downloads)
+        {
+            state.downloads = downloads;
         },
 
         setCurrent(state, current)
@@ -55,6 +104,9 @@ export default new Vuex.Store({
                                     case 'update':
                                         commit('push', obj.songs);
                                         break;
+                                    case 'downloads':
+                                        commit('pushDownloads', obj.downloads);
+                                        break;
                                     case 'play':
                                         commit('setPaused', false);
                                         commit('setCurrent', obj.song);
@@ -66,9 +118,6 @@ export default new Vuex.Store({
                                         if (obj.position !== -1 && (Math.abs(state.current.durationValue - obj.position) > 0.6 || state.current.durationMax !== obj.duration)) {
                                             commit('setPosition', { pos: obj.position, dur: obj.duration });
                                         }
-                                        break;
-                                    case 'download':
-                                        // obj.song & obj.value (converted, progress, finished) (obj.param)
                                         break;
                                 }
 
@@ -120,6 +169,18 @@ export default new Vuex.Store({
         remove(_, song)
         {
             cordova.exec(null, null, 'Thundermusic', 'remove', [song]);
+        },
+
+        download(_, song)
+        {
+            let { title, artist } = extract(song.title, song.channel);
+
+            cordova.exec(null, null, 'Thundermusic', 'download', [{
+                id: song.id,
+                title,
+                artist,
+                thumbnail: song.thumbnail
+            }])
         }
     }
 });

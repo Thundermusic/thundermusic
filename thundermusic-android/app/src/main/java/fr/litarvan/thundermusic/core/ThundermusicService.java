@@ -33,6 +33,7 @@ public class ThundermusicService extends Service
     public static final int RSP_ERROR = 13;
     public static final int RSP_EVENT = 14;
     public static final int RSP_POSITION = 15;
+    public static final int RSP_DOWNLOADS = 16;
 
     private Messenger messenger;
     private ResultReceiver receiver;
@@ -68,16 +69,15 @@ public class ThundermusicService extends Service
                         }
                     };
                     t.start();
-
                     break;
                 case MSG_DOWNLOAD:
+                    System.out.println("Ah oui le download");
                     try {
                         downloadManager.download(SongToDownload.fromJSON(new JSONObject(cpy.getData().getString("song"))));
                     } catch (JSONException e) {
                         Log.e("Thundermusic", "Error while parsing song infos", e);
                         error("Error while parsing song infos : " + e.getMessage());
                     }
-
                     break;
                 case MSG_PLAY:
                     Thread t2 = new Thread()
@@ -87,8 +87,6 @@ public class ThundermusicService extends Service
                         {
                             try {
                                 player.play(Song.fromJSON(new JSONObject(cpy.getData().getString("song"))));
-                                System.out.println("Obj : " + cpy.getData().getString("song"));
-                                //player.play(Song.fromJSON(new JSONObject((String) cpy.obj)));
                             } catch (JSONException | IOException e) {
                                 Log.e("Thundermusic", "Error while parsing song infos", e);
                                 error("Error while parsing song infos : " + e.getMessage());
@@ -151,7 +149,7 @@ public class ThundermusicService extends Service
     {
         musicManager = new MusicManager(context, receiver);
         player = new MusicPlayer(context, receiver, musicManager);
-        //downloadManager = new DownloadManager(context, musicManager, receiver); TODO: Download manager
+        downloadManager = new DownloadManager(context, musicManager, receiver);
 
         musicManager.setPlayer(player);
 
@@ -161,6 +159,8 @@ public class ThundermusicService extends Service
             Log.e("Thundermusic", "Error while reading songs", e);
             error("Error while reading songs : " + e.getMessage());
         }
+
+        downloadManager.start();
     }
 
     protected void error(String message)
@@ -184,7 +184,7 @@ public class ThundermusicService extends Service
     @Override
     public boolean onUnbind(Intent intent)
     {
-        // TODO: Remove notification ? Stop self ?
+        // TODO: Remove notification ?
         return super.onUnbind(intent);
     }
 }

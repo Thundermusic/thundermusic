@@ -6,7 +6,7 @@
             <v-text-field solo :readonly="searching" v-model="query" autofocus autocapitalize="off" autocomplete="off" spellcheck="false" autocorrect="off" placeholder="Rechercher..." append-icon="search" />
         </v-form>
 
-        <MusicList :content="results" />
+        <MusicList :content="results" :download="true" />
     </div>
 </template>
 

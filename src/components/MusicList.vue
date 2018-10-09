@@ -32,13 +32,18 @@
     import Loading from "./Loading";
     export default {
         name: 'music-list',
-        components: {Loading},
-        props: ['content', 'sideButtons', 'canPlay'],
+        components: { Loading },
+        props: ['content', 'sideButtons', 'canPlay', 'download'],
 
         methods: {
             play(music) {
                 if (this.canPlay) {
                     this.$store.dispatch('play', music);
+                    return;
+                }
+
+                if (this.download) {
+                    this.$store.dispatch('download', music);
                 }
             }
         },
@@ -63,7 +68,7 @@
     }
 
     .music-title, .music-artist {
-        max-width: 100%;
+        max-width: calc(100% - 20px);
     }
 
     .thumbnail {
