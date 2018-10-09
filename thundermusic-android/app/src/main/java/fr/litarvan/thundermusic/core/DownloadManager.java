@@ -26,15 +26,13 @@ import org.json.JSONException;
 
 public class DownloadManager
 {
-    private Context context; // TODO: Delete ?
     private MusicManager musicManager;
     private ResultReceiver receiver;
     private BlockingQueue<SongToDownload> queue;
     private List<SongToDownload> downloads;
 
-    public DownloadManager(Context context, MusicManager musicManager, ResultReceiver receiver)
+    public DownloadManager(MusicManager musicManager, ResultReceiver receiver)
     {
-        this.context = context;
         this.musicManager = musicManager;
         this.receiver = receiver;
         this.queue = new LinkedBlockingQueue<>();
@@ -43,7 +41,6 @@ public class DownloadManager
 
     public void download(SongToDownload song)
     {
-        System.out.println("Oui on a recu : " + song.getTitle());
         this.queue.offer(song);
         this.downloads.add(song);
     }
@@ -55,14 +52,12 @@ public class DownloadManager
             public void run()
             {
                 while (true) {
-                    System.out.println("On poll...");
                     SongToDownload song;
                     try {
                         song = queue.poll(Integer.MAX_VALUE, TimeUnit.DAYS);
                     } catch (InterruptedException e) {
                         break;
                     }
-                    System.out.println("OK lets go : " + song.getTitle());
 
                     File output = musicManager.getFile(song);
 
@@ -99,14 +94,12 @@ public class DownloadManager
                         out.close();
                     } catch (IOException ignored) { }
 
-                    System.out.println("Bon bah on add");
                     try {
                         musicManager.create(song, output, thumbnail, true);
                     } catch (Exception e) {
                         error("Error while adding song", e);
                     }
 
-                    System.out.println("Eh bah voila");
                     SongToDownload[] songs = downloads.toArray(new SongToDownload[0]);
                     for (int i = 0; i < songs.length; i++)
                     {
@@ -134,8 +127,6 @@ public class DownloadManager
         connection.connect();
 
         int fileLength = connection.getContentLength();
-        System.out.println("URL : " + urlStr);
-        System.out.println("File length : " + fileLength);
 
         InputStream input = new BufferedInputStream(connection.getInputStream());
 

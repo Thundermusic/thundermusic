@@ -1,16 +1,31 @@
 package fr.litarvan.thundermusic.core;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class EventManager
 {
+    private Queue<JSONObject> queued;
     private EventListener nextListener;
+
+    public EventManager()
+    {
+        this.queued = new LinkedList<>();
+    }
 
     public void listen(EventListener next)
     {
         this.nextListener = next;
+
+        if (!queued.isEmpty()) {
+            nextListener.accept(queued.poll());
+        }
     }
 
     public void error(String error)
@@ -28,13 +43,25 @@ public class EventManager
 
     public void emit(JSONObject event)
     {
-        if (nextListener != null) {
-            nextListener.accept(event);
+        if (!queued.isEmpty() || nextListener == null || nextListener.emitted) {
+            queued.offer(event);
+            return;
         }
+
+        nextListener.accept(event);
     }
 
     public static abstract class EventListener
     {
-        public abstract void accept(JSONObject event);
+        private boolean emitted;
+
+        public void accept(JSONObject event) {
+            this.emitted = true;
+        };
+
+        public boolean isEmitted()
+        {
+            return emitted;
+        }
     }
 }

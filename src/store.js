@@ -8,7 +8,7 @@ const cordova = window.cordova;
 function extract(videoTitle, channel) {
     const video = videoTitle.trim().replace(/(\(|\[)(?!(ft|feat)).*(\)|\])/g, '')
         .replace(/\s+/g, ' ')
-        .replace(/[^\[\(]((ft|feat)\..*)/g, (_, r) => ` (${r})`);
+        .replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`);
 
     let title = null;
     let artist = null;
@@ -45,7 +45,7 @@ function extract(videoTitle, channel) {
         artist = channel;
     }
 
-    return { title, artist };
+    return { title: title.trim(), artist: artist.trim() };
 }
 
 export default new Vuex.Store({

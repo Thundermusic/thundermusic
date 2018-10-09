@@ -149,9 +149,7 @@ public class ThundermusicService extends Service
     {
         musicManager = new MusicManager(context, receiver);
         player = new MusicPlayer(context, receiver, musicManager);
-        downloadManager = new DownloadManager(context, musicManager, receiver);
-
-        musicManager.setPlayer(player);
+        downloadManager = new DownloadManager(musicManager, receiver);
 
         try {
             musicManager.load();

@@ -35,7 +35,6 @@ public class MusicManager
 {
     private Context context;
     private ResultReceiver resultReceiver;
-    private MusicPlayer player;
 
     private File songFolder;
     private File cacheFile;
@@ -88,8 +87,6 @@ public class MusicManager
             }
 
             if (original == null) {
-                /*AudioFile audio = AudioFileIO.read(file);
-                Tag tags = audio.getTag();*/
                 Mp3File audio = new Mp3File(file);
                 String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
                 String artist = "Artiste inconnu";
@@ -102,8 +99,6 @@ public class MusicManager
 
                 Song song = create(new SongToDownload(
                     UUID.randomUUID().toString().substring(0, 10),
-                    /*tags.getFirst(FieldKey.TITLE),
-                    tags.getFirst(FieldKey.ARTIST),*/
                     title,
                     artist,
                     null
@@ -138,7 +133,6 @@ public class MusicManager
 
         songs.add(song);
 
-        System.out.println("On va write les tags, thumb de " + (thumbnail == null ? "null" : thumbnail.length));
         writeTags(song, thumbnail);
         updateThumb(song);
 
@@ -170,19 +164,6 @@ public class MusicManager
 
     protected void updateThumb(Song song) throws Exception
     {
-        /*AudioFile audio = AudioFileIO.read(song.getFile());
-
-        Artwork artwork = audio.getTag().getFirstArtwork();
-        System.out.println("Artwork ? " + artwork);
-        if (artwork != null) {
-            try (FileOutputStream out = new FileOutputStream(thumb)) {
-                out.write(artwork.getBinaryData());
-            }
-
-            System.out.println("Bon bah settons ! " + thumb.getAbsolutePath());
-            song.setImage(thumb);
-        }*/
-
         Mp3File file = new Mp3File(song.getFile());
         if (file.hasId3v2Tag()) {
             ID3v2 tags = file.getId3v2Tag();
@@ -196,7 +177,6 @@ public class MusicManager
                     out.write(image);
                 }
 
-                System.out.println("Bon bah settons ! " + thumb.getAbsolutePath());
                 song.setImage(thumb);
             }
         }
@@ -225,29 +205,6 @@ public class MusicManager
         file.save(newFile.getAbsolutePath());
 
         oldFile.delete();
-
-        /*AudioFile audio = AudioFileIO.read(song.getFile());
-        Tag tags = audio.getTag();
-
-        tags.setField(FieldKey.CUSTOM1, song.getId());
-        tags.setField(FieldKey.ARTIST, song.getArtist());
-        tags.setField(FieldKey.TITLE, song.getTitle());
-
-        if (thumbnail != null) {
-            System.out.println("Lets go on la write, evidemment mime type : " + ImageFormats.getMimeTypeForBinarySignature(thumbnail));
-            Artwork artwork = new AndroidArtwork();
-            artwork.setBinaryData(thumbnail);
-            artwork.setMimeType(ImageFormats.getMimeTypeForBinarySignature(thumbnail));
-            artwork.setDescription("");
-            artwork.setPictureType(PictureTypes.DEFAULT_ID);
-
-            tags.getArtworkList().add(artwork);
-        }
-
-        audio.setTag(tags);
-        audio.commit();*/
-
-        System.out.println("Cest ecrit");
     }
 
     protected void updateCache() throws Exception
@@ -255,7 +212,7 @@ public class MusicManager
         Collections.sort(songs, new Comparator<Song>() {
             @Override
             public int compare(Song song, Song t1) {
-                return song.getTitle().compareToIgnoreCase(t1.getTitle());
+                return song.getTitle().trim().compareToIgnoreCase(t1.getTitle().trim());
             }
         });
 
@@ -263,7 +220,7 @@ public class MusicManager
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cacheFile)))) {
             for (Song song : this.songs) {
-                songs.put(song.toJSON()); // TODO: Check this
+                songs.put(song.toJSON());
             }
 
             writer.write(songs.toString());
@@ -283,11 +240,6 @@ public class MusicManager
         bundle.putString("event", event.toString());
 
         resultReceiver.send(ThundermusicService.RSP_EVENT, bundle);
-    }
-
-    public void setPlayer(MusicPlayer player)
-    {
-        this.player = player;
     }
 
     public List<Song> getSongs()

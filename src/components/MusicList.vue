@@ -3,7 +3,6 @@
         <Loading :isLoading="!initialized" />
 
         <v-list class="list" two-line>
-            <!--<template v-for="(music, index) in content">-->
             <recycle-list :items="content" :item-height="72" page-mode v-if="initialized">
                 <template slot-scope="{ item: music, index }">
                     <v-list-tile :key="index" :class="{ 'current': current.id === music.id }" avatar ripple @click="play(music)">
@@ -11,8 +10,8 @@
                             <img class="thumbnail" :src="music.image || music.thumbnail" />
                         </v-list-tile-avatar>
                         <v-list-tile-content>
-                            <v-list-tile-title class="music-title">{{ music.title }}</v-list-tile-title>
-                            <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
+                            <v-list-tile-title class="music-title" :class="{ 'small': download }">{{ music.title }}</v-list-tile-title>
+                            <v-list-tile-sub-title class="music-artist text--primary" :class="{ 'small': download }">{{ music.artist || music.channel }}</v-list-tile-sub-title>
                             <v-list-tile-sub-title>(3:21)</v-list-tile-sub-title>
                         </v-list-tile-content>
                         <v-list-tile-action v-if="sideButtons">
@@ -23,13 +22,13 @@
                     <v-divider v-if="index + 1 < content.length" :key="`divider-${index}`"></v-divider>
                 </template>
             </recycle-list>
-            <!--</template>-->
         </v-list>
     </div>
 </template>
 
 <script>
-    import Loading from "./Loading";
+    import Loading from './Loading';
+
     export default {
         name: 'music-list',
         components: { Loading },
@@ -67,10 +66,6 @@
         font-weight: 500;
     }
 
-    .music-title, .music-artist {
-        max-width: calc(100% - 20px);
-    }
-
     .thumbnail {
         height: 50px !important;
         width: 90px !important;
@@ -83,7 +78,7 @@
     }
 
     .v-list__tile__avatar {
-        min-width: initial;
+        min-width: 105px;
     }
 
     .current {

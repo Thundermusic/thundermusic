@@ -43,7 +43,6 @@ public class SongToDownload
 
     public void setProgress(int progress)
     {
-        System.out.println(title + " : progress : " + progress);
         this.progress = progress;
     }
 

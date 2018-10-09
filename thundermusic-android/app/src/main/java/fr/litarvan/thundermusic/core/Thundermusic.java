@@ -111,7 +111,6 @@ public class Thundermusic extends CordovaPlugin
                             event.put("type", "downloads");
                             event.put("downloads", songs);
 
-                            System.out.println("On part sur une emission de : " + songs.toString());
                             eventManager.emit(event);
                         } catch (JSONException e) {
                             Log.e("Thundermusic", "Error while sending downloads event", e);
@@ -155,6 +154,7 @@ public class Thundermusic extends CordovaPlugin
                     @Override
                     public void accept(JSONObject event)
                     {
+                        super.accept(event);
                         callbackContext.success(event);
                     }
                 });
