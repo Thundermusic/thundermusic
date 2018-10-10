@@ -23,54 +23,21 @@ public class MusicControlBroadcastReceiver extends BroadcastReceiver
             return;
         }
 
-        /*
-        case 'music-controls-next':
-			// Do something
-			break;
-		case 'music-controls-previous':
-			// Do something
-			break;
-		case 'music-controls-pause':
-			// Do something
-			break;
-		case 'music-controls-play':
-			// Do something
-			break;
-		case 'music-controls-destroy':
-			// Do something
-			break;
-
-		// External controls (iOS only)
-    	case 'music-controls-toggle-play-pause' :
-			// Do something
-			break;
-    	case 'music-controls-seek-to':
-			const seekToInSeconds = JSON.parse(action).position;
-			MusicControls.updateElapsed({
-				elapsed: seekToInSeconds,
-				isPlaying: true
-			});
-			// Do something
-			break;
-
-		// Headset events (Android only)
-		// All media button events are listed below
-		case 'music-controls-media-button' :
-			// Do something
-			break;
-		case 'music-controls-headset-unplugged':
-			// Do something
-			break;
-		case 'music-controls-headset-plugged':
-			// Do something
-			break;
-		default:
-			break;
-         */
-
         switch (intent.getAction()) {
             case "music-controls-next":
-
+                try {
+                    this.player.next();
+                } catch (IOException ignored) {
+                }
+                break;
+            case "music-controls-previous":
+                try {
+                    this.player.previous();
+                } catch (IOException ignored) {
+                }
+                break;
+            case "music-controls-pause":
+                this.player.pause();
                 break;
             case "music-controls-media-button":
                 KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
@@ -97,6 +64,12 @@ public class MusicControlBroadcastReceiver extends BroadcastReceiver
                         }
                         break;
                 }
+                break;
+            case "music-controls-destroy":
+                this.player.destroy();
+                break;
+            default:
+                System.out.println("AHHHHHHHHHHH : " + intent.getAction());
                 break;
         }
     }

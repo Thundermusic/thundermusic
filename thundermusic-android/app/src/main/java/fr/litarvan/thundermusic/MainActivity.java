@@ -25,13 +25,10 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-//import fr.litarvan.thundermusic.core.ThundermusicService.TestBinder;
 import org.apache.cordova.*;
 
 public class MainActivity extends CordovaActivity
 {
-    //private ThundermusicService service;
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

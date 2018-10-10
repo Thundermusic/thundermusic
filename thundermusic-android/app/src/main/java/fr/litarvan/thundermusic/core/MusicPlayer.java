@@ -35,15 +35,12 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
     {
         this.context = context;
         this.resultReceiver = resultReceiver;
-        this.mediaPlayer = new MediaPlayer();
         this.musicManager = musicManager;
-        this.mediaPlayer.setOnPreparedListener(this);
-        this.mediaPlayer.setOnCompletionListener(this);
     }
 
     public void init()
     {
-        this.notification = new MusicControlNotification(context, 6727);
+        this.notification = new MusicControlNotification(context);
         BroadcastReceiver receiver = new MusicControlBroadcastReceiver(this);
 
         context.registerReceiver(receiver, new IntentFilter("music-controls-previous"));
@@ -67,6 +64,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
     }
 
     public void destroy() {
+        if (current != null) {
+            current = null;
+            updateCurrentEvent();
+
+            this.mediaPlayer.stop();
+            this.mediaPlayer.release();
+            this.mediaPlayer = null;
+        }
+
         this.notification.destroy();
     }
 
@@ -76,6 +82,13 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
             askedPlay = true;
         }
 
+        if (mediaPlayer == null) {
+            this.mediaPlayer = new MediaPlayer();
+
+            this.mediaPlayer.setOnPreparedListener(this);
+            this.mediaPlayer.setOnCompletionListener(this);
+        }
+
         mediaPlayer.reset();
         mediaPlayer.setWakeMode(context, PowerManager.PARTIAL_WAKE_LOCK);
         mediaPlayer.setDataSource(song.getFile().getPath());
@@ -83,10 +96,17 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
         mediaPlayer.prepareAsync();
 
         current = song;
+        paused = false;
+
+        notification.update(song.getTitle(), song.getArtist(), song.getImage(), this.paused);
     }
 
     public void pause()
     {
+        if (current == null) {
+            return;
+        }
+
         if (paused) {
             mediaPlayer.start();
         } else {
@@ -94,6 +114,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
         }
 
         paused = !paused;
+        notification.update(current.getTitle(), current.getArtist(), current.getImage(), this.paused);
 
         JSONObject object = new JSONObject();
 
@@ -115,6 +136,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
 
     public void next() throws IOException
     {
+        if (current == null) {
+            return;
+        }
+
         int index = getIndex();
 
         if (musicManager.getSongs().size() - 1 <= index) {
@@ -128,7 +153,11 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
 
     public void previous() throws IOException
     {
-        if (current != null && mediaPlayer.getCurrentPosition() > 3000) {
+        if (current == null) {
+            return;
+        }
+
+        if (mediaPlayer.getCurrentPosition() > 3000) {
             seek(0);
             return;
         }
@@ -146,6 +175,10 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
 
     public void seek(int ms)
     {
+        if (current == null) {
+            return;
+        }
+
         mediaPlayer.seekTo(ms);
     }
 
@@ -181,17 +214,13 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
         return 0;
     }
 
-    @Override
-    public void onPrepared(MediaPlayer mediaPlayer)
+    public void updateCurrentEvent()
     {
-        mediaPlayer.start();
-        paused = false;
-
         JSONObject object = new JSONObject();
 
         try {
             object.put("type", "play");
-            object.put("song", current.toJSON());
+            object.put("song", current == null ? null : current.toJSON());
 
             Bundle bundle = new Bundle();
             bundle.putString("event", object.toString());
@@ -203,6 +232,15 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
 
             resultReceiver.send(ThundermusicService.RSP_ERROR, bundle);
         }
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mediaPlayer)
+    {
+        mediaPlayer.start();
+        paused = false;
+
+        updateCurrentEvent();
     }
 
     @Override

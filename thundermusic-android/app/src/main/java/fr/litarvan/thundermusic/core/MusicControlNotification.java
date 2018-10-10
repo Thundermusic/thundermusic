@@ -13,12 +13,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.util.Log;
 import fr.litarvan.thundermusic.MainActivity;
+import fr.litarvan.thundermusic.R;
 
 public class MusicControlNotification
 {
+    public static final int ID = 6727;
     public static final String CHANNEL_ID = "thundermusic-control";
 
     private Context context;
@@ -29,13 +30,13 @@ public class MusicControlNotification
     private File lastThumb;
     private Bitmap lastBitmap;
 
-    public MusicControlNotification(Context context, int id)
+    public MusicControlNotification(Context context)
     {
         this.context = context;
-        this.notificationID = id;
+        this.notificationID = ID;
         this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
             CharSequence name = CHANNEL_ID;
             String description = "Thundermusic control notification";
 
@@ -59,12 +60,27 @@ public class MusicControlNotification
                 Log.e("TM-Notification", "Can't read bitmap '" + thumb.getAbsolutePath() + "'", e);
             }
 
+            // Make it squared
+
+            int x, y, width, height;
+            if (bitmap.getWidth() > bitmap.getHeight()) {
+                x = (bitmap.getWidth() - bitmap.getHeight()) / 2;
+                y = 0;
+                width = height = bitmap.getHeight();
+            } else {
+                x = 0;
+                y = (bitmap.getHeight() - bitmap.getWidth()) / 2;
+                width = height = bitmap.getWidth();
+            }
+
+            bitmap = Bitmap.createBitmap(bitmap, x, y, width - 90 /* ? */, height);
+
             lastThumb = thumb;
             lastBitmap = bitmap;
         }
 
         Notification.Builder builder = new Notification.Builder(context);
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
             builder.setChannelId(this.CHANNEL_ID);
         }
 
@@ -83,8 +99,12 @@ public class MusicControlNotification
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
-        builder.setSmallIcon(paused ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause);
+        builder.setSmallIcon(R.drawable.icon_notify);
         builder.setLargeIcon(bitmap);
+
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
+            builder.setColor(0x4b4b4b);
+        }
 
         Intent resultIntent = new Intent(context, MainActivity.class);
         resultIntent.setAction(Intent.ACTION_MAIN);
@@ -94,19 +114,19 @@ public class MusicControlNotification
 
         Intent previousIntent = new Intent("music-controls-previous");
         PendingIntent previousPendingIntent = PendingIntent.getBroadcast(context, 1, previousIntent, 0);
-        builder.addAction(android.R.drawable.ic_media_previous, "", previousPendingIntent);
+        builder.addAction(R.drawable.ic_previous, "", previousPendingIntent);
 
         Intent pauseIntent = new Intent( "music-controls-pause");
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context, 1, pauseIntent, 0);
-        builder.addAction(paused ? android.R.drawable.ic_media_play : android.R.drawable.ic_media_pause, "", pausePendingIntent); // ou play
+        builder.addAction(paused ? R.drawable.ic_play : R.drawable.ic_pause, "", pausePendingIntent); // ou play
 
         Intent nextIntent = new Intent("music-controls-next");
         PendingIntent nextPendingIntent = PendingIntent.getBroadcast(context, 1, nextIntent, 0);
-        builder.addAction(android.R.drawable.ic_media_next, "", nextPendingIntent);
+        builder.addAction(R.drawable.ic_next, "", nextPendingIntent);
 
         Intent destroyIntent = new Intent("music-controls-destroy");
         PendingIntent destroyPendingIntent = PendingIntent.getBroadcast(context, 1, destroyIntent, 0);
-        builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, "", destroyPendingIntent);
+        builder.addAction(R.drawable.ic_close, "", destroyPendingIntent);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
             builder.setStyle(new Notification.MediaStyle().setShowActionsInCompactView(0, 1, 2, 4));

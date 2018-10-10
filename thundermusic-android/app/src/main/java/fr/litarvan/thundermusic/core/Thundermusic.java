@@ -1,5 +1,6 @@
 package fr.litarvan.thundermusic.core;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -202,13 +203,7 @@ public class Thundermusic extends CordovaPlugin
 
     protected void send(int message, Bundle data)
     {
-        /*String song = "";
-        if (data != null) {
-            song = data.getString("song");
-            System.out.println("data : " + song);
-        }*/
-
-        Message msg = Message.obtain(null, message, 0, 0/*, song*/);
+        Message msg = Message.obtain(null, message, 0, 0);
         if (data != null)
         {
             msg.setData(data);
@@ -228,11 +223,17 @@ public class Thundermusic extends CordovaPlugin
     @Override
     public void onDestroy()
     {
-        super.onDestroy();
+        NotificationManager notificationManager = (NotificationManager) this.webView.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (notificationManager != null) {
+            notificationManager.cancel(MusicControlNotification.ID);
+        }
 
         if (playerConnection != null)
         {
             this.webView.getContext().unbindService(playerConnection);
         }
+
+        super.onDestroy();
     }
 }

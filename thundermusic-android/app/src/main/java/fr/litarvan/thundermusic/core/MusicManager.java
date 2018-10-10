@@ -133,7 +133,10 @@ public class MusicManager
 
         songs.add(song);
 
-        writeTags(song, thumbnail);
+        if (updateCache) {
+            writeTags(song, thumbnail);
+        }
+
         updateThumb(song);
 
         if (updateCache) {
@@ -193,7 +196,7 @@ public class MusicManager
         ID3v2 tags = file.hasId3v2Tag() ? file.getId3v2Tag() : new ID3v24Tag();
 
         tags.setComment(song.getId());
-        tags.setTitle(song.getArtist());
+        tags.setTitle(song.getTitle());
         tags.setArtist(song.getArtist());
 
         if (thumbnail != null) {

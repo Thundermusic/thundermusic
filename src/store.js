@@ -82,12 +82,14 @@ function extract(videoTitle, channel) {
     return { title: title.trim(), artist: artist.trim() };
 }
 
+const DEFAULT_SONG = { id: 'default', title: 'Aucune musique', artist: 'Personne' };
+
 export default new Vuex.Store({
     state: {
         initialized: false,
         musics: [],
         downloads: [],
-        current: { title: 'Aucune musique', artist: 'Personne' },
+        current: DEFAULT_SONG,
         paused: false,
         position: 0,
         duration: 0
@@ -127,6 +129,10 @@ export default new Vuex.Store({
     actions: {
         load({ state, commit })
         {
+            if (state.initialized) {
+                return;
+            }
+
             return new Promise((resolve, reject) => {
                 document.addEventListener('deviceready', () =>
                     {
@@ -143,7 +149,7 @@ export default new Vuex.Store({
                                         break;
                                     case 'play':
                                         commit('setPaused', false);
-                                        commit('setCurrent', obj.song);
+                                        commit('setCurrent', obj.song || DEFAULT_SONG);
                                         break;
                                     case 'pause':
                                         commit('setPaused', obj.paused);

@@ -179,11 +179,4 @@ public class ThundermusicService extends Service
 
         return messenger.getBinder();
     }
-
-    @Override
-    public boolean onUnbind(Intent intent)
-    {
-        this.player.destroy();
-        return super.onUnbind(intent);
-    }
 }
