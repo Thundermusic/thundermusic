@@ -197,7 +197,6 @@ public class MusicManager
         tags.setArtist(song.getArtist());
 
         if (thumbnail != null) {
-            System.out.println("Artwork ecrit");
             tags.setAlbumImage(thumbnail, "image/jpeg");
         }
 

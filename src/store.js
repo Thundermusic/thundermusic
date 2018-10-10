@@ -6,9 +6,43 @@ Vue.use(Vuex);
 const cordova = window.cordova;
 
 function extract(videoTitle, channel) {
-    const video = videoTitle.trim().replace(/(\(|\[)(?!(ft|feat)).*(\)|\])/g, '')
-        .replace(/\s+/g, ' ')
-        .replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`);
+    let video = videoTitle.trim();
+
+    while (video.indexOf('[') !== -1 && video.indexOf(']') !== -1) {
+        let a = video.indexOf('['), b = video.indexOf(']');
+
+        if (video.length > a + 2 && video.substr(a + 1, a + 3) === 'ft' ||
+            video.length > a + 4 && video.substr(a + 1, a + 5) === 'feat')
+            continue;
+
+        video = (video.substr(0, a) + video.substr(b + 1, video.length)).trim();
+    }
+
+    while (video.indexOf('(') !== -1 && video.indexOf(')') !== -1) {
+        let a = video.indexOf('('), b = video.indexOf(')');
+
+        if (video.length > a + 2 && video.substr(a + 1, a + 3) === 'ft' ||
+            video.length > a + 4 && video.substr(a + 1, a + 5) === 'feat')
+            continue;
+
+        video = (video.substr(0, a) + video.substr(b + 1, video.length)).trim();
+    }
+
+    video = video.replace(/\s+/g, ' ')
+        .replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`).trim();
+
+    if (video.startsWith('-'))
+    {
+        video = video.substr(1).trim();
+    }
+
+    if (video.endsWith('-'))
+    {
+        video = video.substr(video.length - 1).trim();
+    }
+
+    // 'The Chainsmokers - Side Effects (Lyric Video) ft. Emily Warren '
+    // --> 'The Chainsmokers - Side Effects (ft. Emily Warren)'
 
     let title = null;
     let artist = null;

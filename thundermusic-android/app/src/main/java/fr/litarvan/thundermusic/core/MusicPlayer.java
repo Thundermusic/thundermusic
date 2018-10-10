@@ -2,7 +2,11 @@ package fr.litarvan.thundermusic.core;
 
 import java.io.IOException;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -11,6 +15,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.ResultReceiver;
 import android.util.Log;
+import android.view.KeyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +25,7 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
     private ResultReceiver resultReceiver;
     private MediaPlayer mediaPlayer;
     private MusicManager musicManager;
+    private MusicControlNotification notification;
 
     private Song current;
     private boolean paused;
@@ -33,6 +39,35 @@ public class MusicPlayer implements OnPreparedListener, OnCompletionListener
         this.musicManager = musicManager;
         this.mediaPlayer.setOnPreparedListener(this);
         this.mediaPlayer.setOnCompletionListener(this);
+    }
+
+    public void init()
+    {
+        this.notification = new MusicControlNotification(context, 6727);
+        BroadcastReceiver receiver = new MusicControlBroadcastReceiver(this);
+
+        context.registerReceiver(receiver, new IntentFilter("music-controls-previous"));
+        context.registerReceiver(receiver, new IntentFilter("music-controls-pause"));
+        context.registerReceiver(receiver, new IntentFilter("music-controls-play"));
+        context.registerReceiver(receiver, new IntentFilter("music-controls-next"));
+        context.registerReceiver(receiver, new IntentFilter("music-controls-media-button"));
+        context.registerReceiver(receiver, new IntentFilter("music-controls-destroy"));
+
+        context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+
+        try {
+            AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+            Intent headsetIntent = new Intent("music-controls-media-button");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, headsetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            audioManager.registerMediaButtonEventReceiver(pendingIntent);
+        } catch (Exception e) {
+            Log.e("TM-MusicPlayer", "Couldn't register music buttons events", e);
+        }
+    }
+
+    public void destroy() {
+        this.notification.destroy();
     }
 
     public void play(Song song) throws IOException

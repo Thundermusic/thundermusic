@@ -159,6 +159,7 @@ public class ThundermusicService extends Service
         }
 
         downloadManager.start();
+        player.init();
     }
 
     protected void error(String message)
@@ -182,7 +183,7 @@ public class ThundermusicService extends Service
     @Override
     public boolean onUnbind(Intent intent)
     {
-        // TODO: Remove notification ?
+        this.player.destroy();
         return super.onUnbind(intent);
     }
 }

@@ -16,7 +16,7 @@
 
     export default {
         name: 'search',
-        components: {Loading, MusicList },
+        components: { Loading, MusicList },
 
         data() {
             return {
