@@ -17,16 +17,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ResultReceiver;
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.ID3v24Tag;
-import com.mpatric.mp3agic.Mp3File;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
-import org.jaudiotagger.tag.images.AndroidArtwork;
 import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
 import org.jaudiotagger.tag.reference.PictureTypes;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -87,14 +83,19 @@ public class MusicManager
             }
 
             if (original == null) {
-                Mp3File audio = new Mp3File(file);
+                //Mp3File audio = new Mp3File(file);
+                //MP3File audio = new MP3File(file);
+                AudioFile audio = AudioFileIO.read(file);
                 String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
                 String artist = "Artiste inconnu";
 
-                if (audio.hasId3v2Tag()) {
-                    ID3v2 tags = audio.getId3v2Tag();
-                    title = tags.getTitle();
-                    artist = tags.getArtist();
+                Tag tags = audio.getTag();
+                //AbstractID3v2 tags = audio.getID3v2Tag();
+                if (tags != null) {
+                    /*title = tags.getTitle();
+                    artist = tags.getArtist();*/
+                    title = tags.getFirstField(FieldKey.TITLE).toString();
+                    artist = tags.getFirstField(FieldKey.ARTIST).toString();
                 }
 
                 Song song = create(new SongToDownload(
@@ -167,13 +168,19 @@ public class MusicManager
 
     protected void updateThumb(Song song) throws Exception
     {
-        Mp3File file = new Mp3File(song.getFile());
-        if (file.hasId3v2Tag()) {
-            ID3v2 tags = file.getId3v2Tag();
-            byte[] image = tags.getAlbumImage();
+        //Mp3File file = new Mp3File(song.getFile());
+        //MP3File file = new MP3File(song.getFile());
+        //AbstractID3v2 tags = file.getID3v2Tag();
+        AudioFile audio = AudioFileIO.read(song.getFile());
+        Tag tags = audio.getTag();
+
+        if (tags != null) {
+            //byte[] image = tags.getFrame();
+            byte[] image = tags.getFirstArtwork().getBinaryData();
 
             if (image != null) {
-                String mime = tags.getAlbumImageMimeType();
+                //String mime = tags.getAlbumImageMimeType();
+                String mime = tags.getFirstArtwork().getMimeType();
                 File thumb = File.createTempFile("thumb-" + song.getId() + "-", "." + mime.substring(mime.lastIndexOf("/") + 1), context.getCacheDir());
 
                 try (FileOutputStream out = new FileOutputStream(thumb)) {
@@ -192,19 +199,35 @@ public class MusicManager
 
         song.getFile().renameTo(oldFile);
 
-        Mp3File file = new Mp3File(oldFile);
-        ID3v2 tags = file.hasId3v2Tag() ? file.getId3v2Tag() : new ID3v24Tag();
+        /*Mp3File file = new Mp3File(oldFile);
+        ID3v2 tags = file.hasId3v2Tag() ? file.getId3v2Tag() : new ID3v24Tag();*/
+        AudioFile audio = AudioFileIO.read(oldFile);
+        Tag tags = audio.getTag();
 
-        tags.setComment(song.getId());
+        /*tags.setComment(song.getId());
         tags.setTitle(song.getTitle());
-        tags.setArtist(song.getArtist());
+        tags.setArtist(song.getArtist());*/
+        tags.setField(FieldKey.TITLE, song.getTitle());
+        tags.setField(FieldKey.ARTIST, song.getArtist());
+        tags.setField(FieldKey.COMMENT, song.getId());
 
         if (thumbnail != null) {
-            tags.setAlbumImage(thumbnail, "image/jpeg");
+            //tags.setAlbumImage(thumbnail, "image/jpeg");
+            tags.deleteArtworkField();
+            Artwork artwork = ArtworkFactory.getNew();
+            artwork.setBinaryData(thumbnail);
+            artwork.setMimeType("image/png");
+            artwork.setPictureType(PictureTypes.DEFAULT_ID);
+            artwork.setDescription("");
+
+            tags.setField(artwork);
         }
 
-        file.setId3v2Tag(tags);
-        file.save(newFile.getAbsolutePath());
+        /*file.setId3v2Tag(tags);
+        file.save(newFile.getAbsolutePath());*/
+        audio.setTag(tags);
+        audio.setFile(newFile);
+        audio.commit();
 
         oldFile.delete();
     }

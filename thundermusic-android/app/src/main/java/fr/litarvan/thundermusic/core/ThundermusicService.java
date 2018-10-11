@@ -54,7 +54,7 @@ public class ThundermusicService extends Service
         @Override
         public void handleMessage(Message msg)
         {
-            Message cpy = Message.obtain(msg); // Needed
+            final Message cpy = Message.obtain(msg); // Needed
 
             switch (msg.what)
             {
@@ -133,7 +133,7 @@ public class ThundermusicService extends Service
                     break;
                 case MSG_REMOVE:
                     try {
-                        musicManager.remove(msg.getData().getParcelable("song"));
+                        musicManager.remove(Song.fromJSON(new JSONObject(msg.getData().getString("song"))));
                     } catch (Exception e) {
                         Log.e("Thundermusic", "Error while parsing song infos", e);
                         error("Error while parsing song infos : " + e.getMessage());

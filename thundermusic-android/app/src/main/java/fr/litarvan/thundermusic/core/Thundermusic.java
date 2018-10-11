@@ -139,7 +139,7 @@ public class Thundermusic extends CordovaPlugin
     }
 
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException
     {
         Bundle bundle = new Bundle();
 
