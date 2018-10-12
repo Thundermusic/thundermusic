@@ -92,7 +92,8 @@ export default new Vuex.Store({
         current: DEFAULT_SONG,
         paused: false,
         position: 0,
-        duration: 0
+        duration: 0,
+        volume: 100
     },
     mutations: {
         push(state, music)
@@ -123,6 +124,9 @@ export default new Vuex.Store({
         {
             state.position = pos;
             state.duration = dur;
+        },
+        setVolume(state, volume) {
+            state.volume = volume;
         }
     },
     actions: {
@@ -161,7 +165,12 @@ export default new Vuex.Store({
 
         seek(_, position)
         {
-            console.log('Seek', position)
+            AUDIO.currentTime = position / 1000
+        },
+
+        changeVolume({ commit }, value) {
+            AUDIO.volume = value / 100;
+            commit('setVolume', value)
         },
 
         update(_, song)

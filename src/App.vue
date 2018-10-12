@@ -1,61 +1,42 @@
 <template>
     <v-app>
-        <v-toolbar fixed color="white" id="toolbar">
-            <v-toolbar-side-icon><img id="icon" src="./assets/icon.png"/></v-toolbar-side-icon>
-            <v-toolbar-title>{{ title() }}</v-toolbar-title>
+        <v-toolbar app fixed color="white">
+            <v-toolbar-side-icon @click="mini = !mini" v-if="$vuetify.breakpoint.smAndUp">
+                <v-icon>menu</v-icon>
+            </v-toolbar-side-icon>
+            <img id="icon" src="./assets/icon.png" width="35"/>
+            <v-toolbar-title>{{ $route.meta.name_fr }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-icon v-if="title() === 'Rechercher'" @click="$router.push('/downloads')">cloud_download</v-icon>
+            <v-icon v-if="$route.meta.name_fr === 'Rechercher'" @click="$router.push('/downloads')">cloud_download</v-icon>
         </v-toolbar>
-        <v-card height="100%" flat>
-            <div id="content">
-                <router-view/>
-            </div>
-            <player-bar/>
-            <v-bottom-nav :value="true" fixed color="white">
-                <v-btn v-for="(route, index) in nav" :key="index" color="primary" flat :to="route.to">
-                    <span>{{ route.name }}</span>
-                    <v-icon>{{ route.icon }}</v-icon>
-                </v-btn>
-            </v-bottom-nav>
-        </v-card>
+        <v-content>
+            <router-view/>
+        </v-content>
+        <player-bar/>
+        <mobile-navbar v-if="$vuetify.breakpoint.xsOnly"/>
+        <navbar :mini="mini" v-else/>
     </v-app>
 </template>
 
 <script>
-import PlayerBar from "./components/PlayerBar.vue"
+import PlayerBar from "./components/layout/PlayerBar.vue"
+import MobileNavbar from "./components/layout/MobileNavbar.vue"
+import Navbar from "./components/layout/Navbar.vue"
+
 export default {
     name: 'App',
+    data() {
+        return {
+            mini: false,
+        }
+    },
     mounted() {
         this.$store.dispatch('load');
     },
-    data() {
-        return {
-            nav: [
-                { name: 'Rechercher', icon: 'search', to: '/search' },
-                { name: 'Musiques', icon: 'library_music', to: '/musics' },
-                { name: 'Playlists', icon: 'queue_music', to: '/playlists' },
-                { name: 'Paramètres', icon: 'settings', to: '/settings' }
-            ]
-        }
-    },
-    methods: {
-        title() {
-            const current = this.$router.currentRoute.path;
-            if (current === '/downloads') {
-                return 'Téléchargements';
-            }
-
-            for (let route of this.nav) {
-                if (route.to === current) {
-                    return route.name;
-                }
-            }
-
-            return 'Thundermusic';
-        }
-    },
     components: {
-        PlayerBar
+        PlayerBar,
+        MobileNavbar,
+        Navbar
     }
 }
 </script>
@@ -65,17 +46,8 @@ export default {
         user-select: none;
     }
 
-    #toolbar {
-        z-index: 5;
-    }
-
-    #icon {
-        width: 35px;
-    }
-
-    #content {
-        margin-top: 56px;
-        margin-bottom: 92px;
+    .v-content {
+       margin-bottom: 48px; //PlayerBar heigth 
     }
 
 </style>

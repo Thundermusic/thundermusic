@@ -7,18 +7,18 @@
 			</v-flex>
 			<v-flex sm8 xs12 class="slider-row">
 				<v-layout row fill-height>
-					<v-flex class="flex-0">
+					<v-flex class="flex-0 display-flex">
 						<span>{{ songPosition | duration }}</span>
 					</v-flex>
-					<v-flex>
-						<v-slider class="px-2 ma-0 mx-3 slider" color="primary" v-model="songPosition" :max="songDuration"></v-slider>
+					<v-flex class="display-flex">
+						<v-slider hide-details class="px-2 ma-0 mx-3 slider" color="primary" v-model="songPosition" :max="songDuration"></v-slider>
 					</v-flex>
-					<v-flex class="flex-0">
+					<v-flex class="flex-0 display-flex">
 						<span>{{ songDuration | duration }}</span>
 					</v-flex>
 				</v-layout>
 			</v-flex>
-			<v-flex sm2 xs6 class="text-xs-center">
+			<v-flex sm1 xs6 class="text-xs-center">
 				<v-btn flat icon @click.prevent="previous">
 					<v-icon>skip_previous</v-icon>
 				</v-btn>
@@ -29,15 +29,17 @@
 					<v-icon>skip_next</v-icon>
 				</v-btn>
 			</v-flex>
-			<v-flex xs12>
-				<v-progress-linear 
-					v-if="$vuetify.breakpoint.xsOnly"
+			<v-flex xs12 v-if="$vuetify.breakpoint.xsOnly">
+				<v-progress-linear
 					class="song-progress ma-0"
 					color="primary"
 					background-color="transparent"
 					height="2"
 					:value="positionValue"
 				></v-progress-linear>
+			</v-flex>
+			<v-flex v-else sm1 class="display-flex">
+				<v-slider prepend-icon="volume_up" hide-details class="px-2 ma-0 mx-3 slider" color="primary" v-model="volume" :max="100"></v-slider>
 			</v-flex>
 		</v-layout>
 	</v-card>
@@ -68,6 +70,14 @@ export default {
                 this.$store.dispatch('seek', value * 1000);
             }
         },
+        volume: {
+            get() {
+                return this.$store.state.volume;
+            },
+            set(value) {
+                this.$store.dispatch('changeVolume', value);
+            }
+        },
         songDuration() {
             return Math.round(this.$store.state.duration / 1000);
         }
@@ -95,10 +105,13 @@ export default {
 </script>
 
 <style lang="scss">
+	$xs-bar-height: 56px;
+
 	.player-bar {
 		position: fixed;
-		bottom: 56px;
+		bottom: 0;
 		width: 100%;
+		z-index: 4;
 
 		.title, .artist {
 			text-overflow: ellipsis;
@@ -118,30 +131,18 @@ export default {
 			font-size: 13px;
 		}
 
-		.slider {
-			height: 100%;
-
-			.v-input__control, .v-input__slot {
-				height: 100%;
-			}
-			.v-messages {
-				display: none;
-			}
-
-			.v-input__slot {
-				margin-bottom: 0;
-			}
-		}
-
 		.flex-0 {
 			flex: 0;
+		}
+
+		.display-flex {
 			display: flex;
 			align-items: center;
 		}
 
 
 		@media screen and (max-width: 600px) {
-			bottom: 56px - 32px;
+			bottom: $xs-bar-height - 32px;
 
 			.slider-row {
 				order: 4;
@@ -149,7 +150,7 @@ export default {
 			}
 
 			&.opened {
-				bottom: 56px;
+				bottom: $xs-bar-height;
 
 				.song-progress {
 					opacity: 0;

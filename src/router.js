@@ -9,13 +9,59 @@ import Downloads from '@/views/Downloads.vue';
 
 Vue.use(Router);
 
+export const routes = [
+    { path: '/', redirect: '/musics' },
+    {
+        path: '/search',
+        component: Search,
+        name: 'search',
+        meta: {
+            name_fr: 'Rechercher',
+            icon: 'search',
+            link: true
+        }
+    },
+    {
+        path: '/musics',
+        component: Musics,
+        name: 'musics',
+        meta: {
+            name_fr: 'Musiques',
+            icon: 'library_music',
+            link: true
+        }
+    },
+    {
+        path: '/playlists',
+        component: Playlists,
+        name: 'playlists',
+        meta: {
+            name_fr: 'Playlists',
+            icon: 'queue_music',
+            mobileOnly: true,
+            link: true
+        }
+    },
+    {
+        path: '/settings',
+        component: Settings,
+        name: 'settings',
+        meta: {
+            name_fr: 'Paramètres',
+            icon: 'settings',
+            link: true
+        }
+    },
+    {
+        path: '/downloads',
+        component: Downloads,
+        name: 'downloads',
+        meta: {
+            name_fr: 'Télechargements'
+        }
+    }
+]
+
 export default new Router({
-    routes: [
-        { path: '/', redirect: '/musics' },
-        { path: '/search', component: Search, name: 'search' },
-        { path: '/musics', component: Musics, name: 'musics' },
-        { path: '/playlists', component: Playlists, name: 'playlists' },
-        { path: '/settings', component: Settings, name: 'settings' },
-        { path: '/downloads', component: Downloads, name: 'downloads' }
-    ]
+    routes
 });
