@@ -252,6 +252,5 @@ function setDownloadURL(format, sig, debug) {
 */
 export function decipherFormat(format, tokens, debug) {
 	const sig = tokens && format.s ? decipher(tokens, format.s) : null;
-	console.log('SIG', sig)
 	setDownloadURL(format, sig, debug);
 }

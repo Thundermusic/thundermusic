@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { getInfo } from './youtube'
+import { downloadFromYoutube } from './youtube'
 
 Vue.use(Vuex);
 
@@ -182,7 +182,7 @@ export default new Vuex.Store({
                 console.log('Youtube')
                 commit('push', {
                     ...song,
-                    url: getInfo(song.youtube.videoId)
+                    url: downloadFromYoutube(song)
                 })
             }
 

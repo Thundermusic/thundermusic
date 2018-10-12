@@ -8,12 +8,12 @@ const VIDEO_EURL = 'https://youtube.googleapis.com/v/';
 const INFO_URL = 'https://www.youtube.com/get_video_info/';
 
 function between(haystack, left, right)  {
-	let pos = haystack.indexOf(left);
-	if (pos === -1) { return ''; }
-	haystack = haystack.slice(pos + left.length);
-	pos = haystack.indexOf(right);
-	if (pos === -1) { return ''; }
-	haystack = haystack.slice(0, pos);
+	const lPos = haystack.indexOf(left);
+	if (lPos === -1) { return ''; }
+	haystack = haystack.slice(lPos + left.length);
+	const rPos = haystack.indexOf(right);
+	if (rPos === -1) { return ''; }
+	haystack = haystack.slice(0, rPos);
 	return haystack;
 }
 
@@ -46,8 +46,7 @@ function parseFormats(info) {
 	return formats.map(addFormatMeta);
 }
 
-export async function getInfo(id) {
-	console.log('ID', id)
+export async function getFormat(id) {
 	const body = await fetch(`${CORS_PROXY}https://www.youtube.com/embed/${id}?hl=en`)
 	.then(res => res.text())
 	const config = JSON.parse(between(body, 't.setConfig({\'PLAYER_CONFIG\': ', '},\'') + '}')
@@ -66,17 +65,64 @@ export async function getInfo(id) {
 	const downloadable = audioOnly.filter(({ live, isHLS, isDashMPD }) => !live && !isHLS && !isDashMPD)
 		.sort(({ audioBitrate: aAudioBitrate }, { audioBitrate: bAudioBitrate }) => bAudioBitrate - aAudioBitrate)
 
-	console.log(downloadable)
-
 	const [toDownload] = downloadable
 
 	decipherFormat(toDownload, await tokens)
 
-	console.log(infos, config)
+	return toDownload
+}
 
-	return toDownload.url
+function sendMessage(message) {
+	const channel = new MessageChannel();
 
-	/*await fetch(downloadable[0].url, {
-		mode: 'no-cors'
-	})*/
+	navigator.serviceWorker.controller.postMessage(message, [channel.port1])
+
+	return new Promise(resolve => channel.port2.onmessage = resolve)
+}
+
+export async function downloadFromYoutube(song) {
+	if ('serviceWorker' in navigator) {
+		const url = `/musics/${song.id}`;
+
+		const { data: hasDownloaded } = await sendMessage({
+			type: 'hasDownloaded',
+			url
+		})
+
+		if (hasDownloaded) {
+			return url;
+		} else {
+			return fetchToFile(await getFormat(song.id), song)
+		}
+	} else {
+		return (await getFormat(song.id)).url
+	}
+}
+
+export async function fetchToFile(format, { id, title, thumbnail }) {
+	const request = CORS_PROXY + format.url
+
+	const registration = await navigator.serviceWorker.ready;
+
+	if (registration.backgroundFetch && ! (await registration.backgroundFetch.get(id))) {
+		await registration.backgroundFetch.fetch(id, [
+			request
+		], {
+			title,
+			downloadTotal: format.clen,
+			icons: [{
+				src: thumbnail
+			}]
+		});
+	} else {
+		console.log("Background Fetch not available")
+	}
+
+	const { data } = await sendMessage({
+		type: 'downloadTo',
+		from: request,
+		to: `/musics/${id}`
+	})
+
+	return data;
 }

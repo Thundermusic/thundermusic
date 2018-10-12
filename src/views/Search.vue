@@ -16,7 +16,6 @@
 
     import { search, addDuration } from '../youtube/search'
 
-
     export default {
         name: 'search',
         components: { Loading, MusicList },
