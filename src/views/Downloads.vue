@@ -33,32 +33,34 @@
     }
 </script>
 
-<style>
-    .list {
-        padding-top: 4px;
-    }
+<style lang="scss">
+    #downloads {
+        .list {
+            padding-top: 4px;
+        }
 
-    .music-title {
-        font-weight: 500;
-    }
+        .music-title {
+            font-weight: 500;
+        }
 
-    .song-progress {
-        max-width: calc(100% - 30px);
-        height: 18px;
-    }
+        .song-progress {
+            max-width: calc(100% - 30px);
+            height: 18px;
+        }
 
-    .thumbnail {
-        height: 50px !important;
-        width: 90px !important;
-        margin-right: 15px;
-        object-fit: cover;
-    }
+        .thumbnail {
+            height: 50px !important;
+            width: 90px !important;
+            margin-right: 15px;
+            object-fit: cover;
+        }
 
-    .v-list__tile__avatar {
-        min-width: 105px;
-    }
+        .v-list__tile__avatar {
+            min-width: 105px;
+        }
 
-    .v-progress-linear {
-        margin: 4px 0 0 0 !important;
+        .v-progress-linear {
+            margin: 4px 0 0 0 !important;
+        }
     }
 </style>

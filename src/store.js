@@ -130,7 +130,7 @@ export default new Vuex.Store({
         {
             commit('setMusics', JSON.parse(localStorage.getItem('musics') || '[]'))
             AUDIO.addEventListener('timeupdate', () => {
-                commit('setPosition', { pos: AUDIO.currentTime, dur: AUDIO.duration })
+                commit('setPosition', { pos: AUDIO.currentTime * 1000, dur: AUDIO.duration * 1000 })
             })
         },
 
