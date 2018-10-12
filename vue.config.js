@@ -1,3 +1,9 @@
 module.exports = {
-    baseUrl: '.'
-};
+    baseUrl: '.',
+    pwa: {
+        workboxPluginMode: 'InjectManifest',
+        workboxOptions: {
+            swSrc: './src/sw.js'
+        }
+    }
+};3
