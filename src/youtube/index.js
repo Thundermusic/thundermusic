@@ -60,12 +60,13 @@ export async function getFormat(id) {
 	
 	const formats = parseFormats(infos)
 
-	const audioOnly = formats.filter(({ bitrate, audioBitrate }) => !bitrate && audioBitrate)
+	// TODO: support adaptive formats (HSLS & Dash) like ytdl-core
+	const downloadable = formats.filter(({ live, isHLS, isDashMPD }) => !live && !isHLS && !isDashMPD)
 
-	const downloadable = audioOnly.filter(({ live, isHLS, isDashMPD }) => !live && !isHLS && !isDashMPD)
+	const audioOnly = downloadable.filter(({ bitrate, audioBitrate }) => !bitrate && audioBitrate)
 		.sort(({ audioBitrate: aAudioBitrate }, { audioBitrate: bAudioBitrate }) => bAudioBitrate - aAudioBitrate)
 
-	const [toDownload] = downloadable
+	const [toDownload] = audioOnly.concat(downloadable)
 
 	decipherFormat(toDownload, await tokens)
 
