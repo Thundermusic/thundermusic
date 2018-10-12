@@ -11,7 +11,6 @@ import router from './router';
 import store from './store';
 
 Vue.config.productionTip = false;
-Vue.prototype.$api = 'https://api.thundermusic.litarvan.com/';
 
 import { VirtualScroller, RecycleList } from 'vue-virtual-scroller'
 import VueVirtualScroller from 'vue-virtual-scroller';

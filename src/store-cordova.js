@@ -1,10 +1,11 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { getInfo } from './youtube'
 
 Vue.use(Vuex);
 
-/*function extract(videoTitle, channel) {
+const cordova = window.cordova;
+
+function extract(videoTitle, channel) {
     let video = videoTitle.trim();
 
     while (video.indexOf('[') !== -1 && video.indexOf(']') !== -1) {
@@ -79,11 +80,9 @@ Vue.use(Vuex);
     }
 
     return { title: title.trim(), artist: artist.trim() };
-}*/
+}
 
 const DEFAULT_SONG = { id: 'default', title: 'Aucune musique', artist: 'Personne' };
-
-const AUDIO = new Audio();
 
 export default new Vuex.Store({
     state: {
@@ -101,9 +100,9 @@ export default new Vuex.Store({
             state.initialized = true;
         },
 
-        push(state, music)
+        push(state, musics)
         {
-            state.musics.push(music);
+            state.musics = musics;
         },
 
         pushDownloads(state, downloads)
@@ -128,64 +127,100 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        load({ commit })
+        load({ state, commit })
         {
-            AUDIO.addEventListener('timeupdate', () => {
-                commit('setPosition', { pos: AUDIO.currentTime, dur: AUDIO.duration })
-            })
+            if (state.initialized) {
+                return;
+            }
+
+            return new Promise((resolve, reject) => {
+                document.addEventListener('deviceready', () =>
+                    {
+                        function listen()
+                        {
+                            cordova.exec(obj => {
+                                switch (obj.type)
+                                {
+                                    case 'update':
+                                        commit('push', obj.songs);
+                                        break;
+                                    case 'downloads':
+                                        commit('pushDownloads', obj.downloads);
+                                        break;
+                                    case 'play':
+                                        commit('setPaused', false);
+                                        commit('setCurrent', obj.song || DEFAULT_SONG);
+                                        break;
+                                    case 'pause':
+                                        commit('setPaused', obj.paused);
+                                        break;
+                                    case 'position':
+                                        if (obj.position !== -1 && (Math.abs(state.current.durationValue - obj.position) > 0.6 || state.current.durationMax !== obj.duration)) {
+                                            commit('setPosition', { pos: obj.position, dur: obj.duration });
+                                        }
+                                        break;
+                                }
+
+                                listen();
+                            }, () => {}, 'Thundermusic', 'listen');
+                        }
+                        listen();
+
+                        cordova.exec(() => {
+                            setInterval(() => cordova.exec(() => {}, () => {}, 'Thundermusic', 'position'), 500);
+                            commit('setInitialized');
+                            resolve();
+                        }, reject, 'Thundermusic', 'init');
+                    },
+                    false);
+            });
         },
 
-        async play({ commit }, music)
+        play(_, music)
         {
-            console.log('Play', music)
-            AUDIO.src = await music.url;
-            AUDIO.play();
-            commit('setCurrent', music)
+            cordova.exec(null, null, 'Thundermusic', 'play', [music]);
         },
 
-        pause({ state, commit })
+        pause()
         {
-            console.log('Pause')
-            state.paused ? AUDIO.play() : AUDIO.pause();
-            commit('setPaused', !state.paused)
+            cordova.exec(null, null, 'Thundermusic', 'pause');
         },
 
         previous()
         {
-            console.log('Previous')
+            cordova.exec(null, null, 'Thundermusic', 'previous');
         },
 
         next()
         {
-            console.log('Next')
+            cordova.exec(null, null, 'Thundermusic', 'next');
         },
 
         seek(_, position)
         {
-            console.log('Seek', position)
+            cordova.exec(null, null, 'Thundermusic', 'seek', [position]);
         },
 
         update(_, song)
         {
-            console.log('Update', song)
+            cordova.exec(null, null, 'Thundermusic', 'update', [song]);
         },
 
         remove(_, song)
         {
-            console.log('Remove', song)
+            cordova.exec(null, null, 'Thundermusic', 'remove', [song]);
         },
 
-        async download({ commit }, song)
+        download(_, song)
         {
-            console.log('Download', song, song.youtube)
-            if (song.youtube) {
-                console.log('Youtube')
-                commit('push', {
-                    ...song,
-                    url: getInfo(song.youtube.videoId)
-                })
-            }
+            let { title, artist } = extract(song.title, song.channel);
 
+            cordova.exec(null, null, 'Thundermusic', 'download', [{
+                id: song.id,
+                title,
+                artist,
+                thumbnail: song.thumbnail
+            }])
         }
     }
 });

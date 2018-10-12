@@ -1,9 +1,7 @@
 <template>
     <div class="music-list">
-        <Loading :isLoading="!initialized" />
-
         <v-list class="list" two-line>
-            <recycle-list :items="content" :item-height="72" page-mode v-if="initialized">
+            <recycle-list :items="content" :item-height="72" page-mode>
                 <template slot-scope="{ item: music, index }">
                     <v-list-tile :key="index" :class="{ 'current': current.id === music.id, 'downloading': isDownloading(music), 'downloaded': isDownloaded(music) }" avatar ripple @click="play(music)">
                         <v-list-tile-avatar :tile="true" size="auto">
@@ -12,7 +10,7 @@
                         <v-list-tile-content>
                             <v-list-tile-title class="music-title" :class="{ 'small': download }">{{ music.title }}</v-list-tile-title>
                             <v-list-tile-sub-title class="music-artist text--primary" :class="{ 'small': download }">{{ music.artist || music.channel }}</v-list-tile-sub-title>
-                            <v-list-tile-sub-title>{{ isDownloading(music) ? 'Téléchargement...' : (isDownloaded(music) ? 'Déjà ajoutée' : '(3.21)') }}</v-list-tile-sub-title>
+                            <v-list-tile-sub-title>{{ isDownloading(music) ? 'Téléchargement...' : (isDownloaded(music) ? 'Déjà ajoutée' : music.duration || '?') }}</v-list-tile-sub-title>
                         </v-list-tile-content>
                         <v-list-tile-action v-if="sideButtons">
                             <v-icon color="grey lighten-1">add</v-icon>
@@ -80,9 +78,6 @@
             current() {
                 return this.$store.state.current;
             },
-            initialized() {
-                return this.$store.state.initialized;
-            }
         }
     }
 </script>

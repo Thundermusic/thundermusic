@@ -14,6 +14,9 @@
     import MusicList from '../components/MusicList';
     import Loading from "../components/Loading";
 
+    import { search, addDuration } from '../youtube/search'
+
+
     export default {
         name: 'search',
         components: { Loading, MusicList },
@@ -27,17 +30,19 @@
         },
         methods: {
             search() {
+
                 this.results = [];
                 this.searching = true;
 
-                fetch(`${this.$api}search?query=${encodeURIComponent(this.query)}`)
-                    .then(res => res.json())
+                search(this.query)
                     .then(results => {
                         this.results = results;
-                        this.searching = false;
-                    }).catch(() => {
-                        this.searching = false;
-                    }); // TODO: catch
+                        addDuration(results);
+                        this.searching = false;                        
+                    }, (e) => {
+                        this.searching = false
+                        throw e;
+                    })
             }
         }
     }
