@@ -87,7 +87,6 @@ const AUDIO = new Audio();
 
 export default new Vuex.Store({
     state: {
-        initialized: false,
         musics: [],
         downloads: [],
         current: DEFAULT_SONG,
@@ -96,14 +95,13 @@ export default new Vuex.Store({
         duration: 0
     },
     mutations: {
-        setInitialized(state)
-        {
-            state.initialized = true;
-        },
-
         push(state, music)
         {
             state.musics.push(music);
+        },
+
+        setMusics(state, musics) {
+            state.musics = musics;
         },
 
         pushDownloads(state, downloads)
@@ -130,6 +128,7 @@ export default new Vuex.Store({
     actions: {
         load({ commit })
         {
+            commit('setMusics', JSON.parse(localStorage.getItem('musics') || '[]'))
             AUDIO.addEventListener('timeupdate', () => {
                 commit('setPosition', { pos: AUDIO.currentTime, dur: AUDIO.duration })
             })
@@ -175,14 +174,23 @@ export default new Vuex.Store({
             console.log('Remove', song)
         },
 
-        async download({ commit }, song)
+        download({ commit }, song)
         {
-            console.log('Download', song, song.youtube)
             if (song.youtube) {
                 console.log('Youtube')
+                const url = downloadFromYoutube(song)
                 commit('push', {
                     ...song,
-                    url: downloadFromYoutube(song)
+                    url
+                })
+                url.then(url => {
+                    localStorage.setItem(
+                        'musics',
+                        JSON.stringify([...(JSON.parse(localStorage.getItem('musics') || '[]')), {
+                            ...song,
+                            url
+                        }])
+                    )
                 })
             }
 

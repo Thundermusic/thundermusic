@@ -73,7 +73,7 @@ export async function getFormat(id) {
 }
 
 function sendMessage(message) {
-	const channel = new MessageChannel();
+	const channel = new MessageChannel()
 
 	navigator.serviceWorker.controller.postMessage(message, [channel.port1])
 
@@ -81,7 +81,7 @@ function sendMessage(message) {
 }
 
 export async function downloadFromYoutube(song) {
-	if ('serviceWorker' in navigator) {
+	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
 		const url = `/musics/${song.id}`;
 
 		const { data: hasDownloaded } = await sendMessage({
