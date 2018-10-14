@@ -14,7 +14,7 @@
         </v-content>
         <player-bar/>
         <mobile-navbar v-if="$vuetify.breakpoint.xsOnly"/>
-        <navbar :mini="mini" v-else/>
+        <navbar :mini="mini" @input="value => mini = value" v-else/>
     </v-app>
 </template>
 

@@ -1,12 +1,12 @@
 <template>
 	<v-card class="player-bar elevation-6" :class="{ opened }">
-		<v-layout row wrap @click="opened = !opened">
-			<v-flex sm2 xs6 class="pl-2 pt-2">
+		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
+			<v-flex class="pl-2 pt-2 infos flex-0">
 				<span class="title">{{ current.title }}</span>
 				<span class="artist">{{ current.artist || current.channel }}</span>
 			</v-flex>
-			<v-flex sm8 xs12 class="slider-row">
-				<v-layout row fill-height>
+			<v-flex class="slider-row">
+				<v-layout row fill-height class="mx-4">
 					<v-flex class="flex-0 display-flex">
 						<span>{{ songPosition | duration }}</span>
 					</v-flex>
@@ -18,7 +18,7 @@
 					</v-flex>
 				</v-layout>
 			</v-flex>
-			<v-flex sm1 xs6 class="text-xs-center">
+			<v-flex class="text-xs-center flex-0 display-flex controls">
 				<v-btn flat icon @click.prevent="previous">
 					<v-icon>skip_previous</v-icon>
 				</v-btn>
@@ -38,7 +38,7 @@
 					:value="positionValue"
 				></v-progress-linear>
 			</v-flex>
-			<v-flex v-else sm1 class="display-flex">
+			<v-flex v-else class="display-flex flex-0 volume">
 				<v-slider prepend-icon="volume_up" hide-details class="px-2 ma-0 mx-3 slider" color="primary" v-model="volume" :max="100"></v-slider>
 			</v-flex>
 		</v-layout>
@@ -113,6 +113,14 @@ export default {
 		width: 100%;
 		z-index: 4;
 
+		.infos {
+			min-width: 250px;
+		}
+
+		.volume {
+			min-width: 175px;
+		}
+
 		.title, .artist {
 			text-overflow: ellipsis;
 			white-space: nowrap;
@@ -140,13 +148,23 @@ export default {
 			align-items: center;
 		}
 
-
-		@media screen and (max-width: 600px) {
-			bottom: $xs-bar-height - 32px;
+		@media screen and (max-width: 959px) {
+			.infos, .volume, .controls {
+				min-width: 33.33%;
+			}
 
 			.slider-row {
 				order: 4;
 				padding: 0 12px;
+			}
+		}
+
+
+		@media screen and (max-width: 599px) {
+			bottom: $xs-bar-height - 32px;
+
+			.controls, .infos {
+				min-width: 50%;
 			}
 
 			&.opened {

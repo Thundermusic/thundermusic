@@ -1,5 +1,5 @@
 <template>
-	<v-navigation-drawer class="navbar" app width="250" :mini-variant="mini">
+	<v-navigation-drawer class="navbar" app width="250" :mini-variant="mini" stateless value="true">
 		<v-list>
 			<v-subheader>Ma Musique</v-subheader>
 			<v-list-tile
@@ -23,6 +23,14 @@ export default {
 	computed: {
 		routes() {
 			return this.$router.options.routes.filter(({ meta: { link, mobileOnly } = {} }) => link && !mobileOnly)
+		},
+		isSmall() {
+			return this.$vuetify.breakpoint.width < 1264
+		}
+	},
+	watch: {
+		isSmall(value) {
+			if (value && !this.mini) this.$emit('input', true);
 		}
 	}
 }
