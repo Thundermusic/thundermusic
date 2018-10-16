@@ -16,7 +16,6 @@ function convertTime(duration) {
 export async function search(query) {
 	const { items } = await fetch(`${API_URL}/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=50&type=video&key=${YOUTUBE_API_KEY}`)
 	.then(res => res.json())
-	console.log(items)
 	const results = items.map(({ id: { videoId }, snippet: { title, channelTitle: channel, thumbnails: { high: { url: thumbnail }} }}) => ({
 		id: videoId,
 		title,

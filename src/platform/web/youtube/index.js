@@ -82,11 +82,26 @@ function sendMessage(message) {
 	return new Promise(resolve => channel.port2.onmessage = ({ data }) => resolve({ data, port: channel.port2 }))
 }
 
+function waitForController() {
+	return new Promise(resolve => {
+		if (navigator.serviceWorker.controller)
+			resolve()
+		else {
+			const handler = () => {
+				resolve()
+				navigator.serviceWorker.removeEventListener('controllerchange', handler)
+			}
+
+			navigator.serviceWorker.addEventListener('controllerchange', handler)
+		}
+	})
+}
+
 export async function download(song, progressFn) {
 	if ('serviceWorker' in navigator) {
-		await navigator.serviceWorker.ready;
+		await waitForController()
 
-		const url = `/musics/${song.id}`;
+		const url = `/musics/${song.id}`
 
 		const { data: hasDownloaded } = await sendMessage({
 			type: 'hasDownloaded',
@@ -94,7 +109,7 @@ export async function download(song, progressFn) {
 		})
 
 		if (hasDownloaded) {
-			return url;
+			return url
 		} else {
 			return fetchToFile(await getFormat(song.id), song, progressFn)
 		}
