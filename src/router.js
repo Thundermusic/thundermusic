@@ -5,7 +5,6 @@ import Search from '@/views/Search.vue';
 import Musics from '@/views/Musics.vue';
 import Playlists from '@/views/Playlists.vue';
 import Settings from '@/views/Settings.vue';
-import Downloads from '@/views/Downloads.vue';
 
 Vue.use(Router);
 
@@ -50,14 +49,6 @@ export const routes = [
             name_fr: 'Paramètres',
             icon: 'settings',
             link: true
-        }
-    },
-    {
-        path: '/downloads',
-        component: Downloads,
-        name: 'downloads',
-        meta: {
-            name_fr: 'Télechargements'
         }
     }
 ]

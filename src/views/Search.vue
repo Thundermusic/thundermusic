@@ -20,6 +20,15 @@
         </v-form>
 
         <music-list :musics="results" :selected="selected" @select="select"/>
+
+        <v-layout column class="controls" v-show="selected.length">
+            <v-btn fab icon dark color="green" @click="downloadAll">
+                <v-icon>cloud_download</v-icon>
+            </v-btn>
+            <v-btn fab icon dark color="red" @click="selected = []">
+                <v-icon>select_all</v-icon>
+            </v-btn>
+        </v-layout>
     </div>
 </template>
 
@@ -49,7 +58,7 @@
                 search(this.query)
                     .then(results => {
                         this.results = results;
-                        this.searching = false;                        
+                        this.searching = false;
                     }, (e) => {
                         this.searching = false;
                         throw e;
@@ -61,7 +70,13 @@
                     this.selected.splice(index, 1)
                 else
                     this.selected.push(music.id)
-                this.$store.dispatch('downloader/download', music)
+            },
+            downloadAll() {
+                this.selected.map(id => this.results.find(music => music.id === id))
+                    .forEach(music => {
+                        this.$store.dispatch('downloader/download', music)
+                    })
+                this.$router.push({ name: 'musics' })
             }
         }
     }
@@ -77,6 +92,13 @@
             width: 100%;
             z-index: 1;
             background: white;
+        }
+
+        .controls {
+            position: fixed;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
         }
     }
 </style>

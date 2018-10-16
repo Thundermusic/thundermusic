@@ -2,7 +2,7 @@
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 pt-2 music flex-0">
-				<div class="disk" :class="{ paused }" :style="{ 'background-image': `url(${current.thumbnail})` }">
+				<div class="disk" :class="{ paused }" :style="{ 'background-image': current.thumbnail && `url(${current.thumbnail})` }">
 					<span class="inner"/>
 				</div>
 				<div class="infos">

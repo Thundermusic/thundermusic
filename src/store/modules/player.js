@@ -12,7 +12,7 @@ const types = {
 
 export const state = {
 	current: DEFAULT_SONG,
-	paused: false,
+	paused: true,
 	position: 0,
 	duration: 0,
 	volume: 100
@@ -47,7 +47,6 @@ export const actions = {
 	},
 	seek({ state }, time) {
 		if (isFinite(time) && time != state.position) {
-			console.log(time, state.position)
 			// onPositionChange will make the commit
 			seek(time)
 		}

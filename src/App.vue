@@ -7,7 +7,6 @@
             <img id="icon" src="./assets/icon.png" width="35"/>
             <v-toolbar-title>{{ $route.meta.name_fr }}</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-icon v-if="$route.meta.name_fr === 'Rechercher'" @click="$router.push('/downloads')">cloud_download</v-icon>
         </v-toolbar>
         <v-content>
             <router-view/>
