@@ -18,32 +18,31 @@
 </template>
 
 <script>
-import PlayerBar from "./components/layout/PlayerBar.vue"
-import MobileNavbar from "./components/layout/MobileNavbar.vue"
-import Navbar from "./components/layout/Navbar.vue"
+import PlayerBar from "./components/layout/PlayerBar.vue";
+import MobileNavbar from "./components/layout/MobileNavbar.vue";
+import Navbar from "./components/layout/Navbar.vue";
 
 export default {
-    name: 'App',
-    data() {
-        return {
-            mini: false,
-        }
-    },
-    components: {
-        PlayerBar,
-        MobileNavbar,
-        Navbar
-    }
-}
+  name: "App",
+  data() {
+    return {
+      mini: false
+    };
+  },
+  components: {
+    PlayerBar,
+    MobileNavbar,
+    Navbar
+  }
+};
 </script>
 
 <style lang="scss">
-    html {
-        user-select: none;
-    }
+html {
+  user-select: none;
+}
 
-    .v-content {
-       margin-bottom: 48px; //PlayerBar heigth 
-    }
-
+.v-content {
+  margin-bottom: 48px; //PlayerBar heigth
+}
 </style>

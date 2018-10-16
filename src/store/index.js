@@ -1,15 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import modules from './modules'
+import Vue from "vue";
+import Vuex from "vuex";
+import modules from "./modules";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
-    modules
-})
+  modules
+});
 
 for (const module in modules) {
-	store.dispatch(`${module}/load`)
+  store.dispatch(`${module}/load`);
 }
 
 export default store;

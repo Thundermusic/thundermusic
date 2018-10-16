@@ -52,150 +52,159 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState } from "vuex";
 export default {
-	data() {
-		return {
-			opened: false
-		}
-	},
-	computed: mapState('player', ['current', 'paused', 'volume', 'position', 'duration']),
-	methods: {
-		...mapActions('player', ['play', 'pause', 'seek', 'setVolume']),
-		...mapActions('musics', ['next', 'previous'])
-	},
-    filters: {
-        duration(val) {
-            const seconds = val % 60;
-            const minutes = (val - seconds) / 60;
+  data() {
+    return {
+      opened: false
+    };
+  },
+  computed: mapState("player", [
+    "current",
+    "paused",
+    "volume",
+    "position",
+    "duration"
+  ]),
+  methods: {
+    ...mapActions("player", ["play", "pause", "seek", "setVolume"]),
+    ...mapActions("musics", ["next", "previous"])
+  },
+  filters: {
+    duration(val) {
+      const seconds = val % 60;
+      const minutes = (val - seconds) / 60;
 
-            return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-        }
+      return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
     }
-}
+  }
+};
 </script>
 
 <style lang="scss">
-	$xs-bar-height: 56px;
+$xs-bar-height: 56px;
 
-	.player-bar {
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		z-index: 4;
+.player-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 4;
 
-		.music {
-			min-width: 250px;
-		}
+  .music {
+    min-width: 250px;
+  }
 
-		.volume {
-			min-width: 175px;
-		}
+  .volume {
+    min-width: 175px;
+  }
 
-		.title, .artist {
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			font-style: normal;
-			overflow: hidden;
-			display: block;
-		}
+  .title,
+  .artist {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-style: normal;
+    overflow: hidden;
+    display: block;
+  }
 
-		.title {
-			font-weight: 500;
-			font-size: 14px !important;
-		}
+  .title {
+    font-weight: 500;
+    font-size: 14px !important;
+  }
 
-		.artist {
-			color: #555;
-			font-size: 13px;
-		}
+  .artist {
+    color: #555;
+    font-size: 13px;
+  }
 
-		.flex-0 {
-			flex: 0;
-		}
+  .flex-0 {
+    flex: 0;
+  }
 
-		.display-flex {
-			display: flex;
-			align-items: center;
-		}
+  .display-flex {
+    display: flex;
+    align-items: center;
+  }
 
-		.infos, .disk {
-			display: inline-block;
-		}
+  .infos,
+  .disk {
+    display: inline-block;
+  }
 
-		$disk-size: 32px;
-		$inner-size: 10px;
+  $disk-size: 32px;
+  $inner-size: 10px;
 
-		@keyframes spin {
-			from {
-				transform: rotate(0deg);
-			}
-			to {
-				transform: rotate(360deg);
-			}
-		}
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-		.disk {
-			width: $disk-size;
-			height: $disk-size;
-			border-radius: 50%;
-			background-size: cover;
-			background-color: black;
-			position: relative;
-			animation: spin 2s linear infinite;
-			box-shadow: 0 0 10px black;
+  .disk {
+    width: $disk-size;
+    height: $disk-size;
+    border-radius: 50%;
+    background-size: cover;
+    background-color: black;
+    position: relative;
+    animation: spin 2s linear infinite;
+    box-shadow: 0 0 10px black;
 
-			&.paused {
-				animation-play-state: paused;
-			}
+    &.paused {
+      animation-play-state: paused;
+    }
 
-			.inner {
-				box-shadow: 0 0 5px black inset;
-				position: absolute;
-				border-radius: 50%;
-				top: ($disk-size - $inner-size)/2;
-				left: ($disk-size - $inner-size)/2;
-				width: $inner-size;
-				height: $inner-size;
-				background-color: white;
-			}
-		}
+    .inner {
+      box-shadow: 0 0 5px black inset;
+      position: absolute;
+      border-radius: 50%;
+      top: ($disk-size - $inner-size)/2;
+      left: ($disk-size - $inner-size)/2;
+      width: $inner-size;
+      height: $inner-size;
+      background-color: white;
+    }
+  }
 
-		.infos {
-			padding-left: 8px;
-			width: calc(100% - #{$disk-size});
-		}
+  .infos {
+    padding-left: 8px;
+    width: calc(100% - #{$disk-size});
+  }
 
-		@media screen and (max-width: 959px) {
-			.music, .volume, .controls {
-				min-width: 33.33%;
-			}
+  @media screen and (max-width: 959px) {
+    .music,
+    .volume,
+    .controls {
+      min-width: 33.33%;
+    }
 
-			.slider-row {
-				order: 4;
-				padding: 0 12px;
-			}
-		}
+    .slider-row {
+      order: 4;
+      padding: 0 12px;
+    }
+  }
 
+  @media screen and (max-width: 599px) {
+    bottom: $xs-bar-height - 32px;
 
-		@media screen and (max-width: 599px) {
-			bottom: $xs-bar-height - 32px;
+    .music {
+      min-width: 60%;
+    }
 
-			.music {
-				min-width: 60%;
-			}
+    .controls {
+      min-width: 40%;
+    }
 
-			.controls {
-				min-width: 40%;
-			}
+    &.opened {
+      bottom: $xs-bar-height;
 
-			&.opened {
-				bottom: $xs-bar-height;
-
-				.song-progress {
-					opacity: 0;
-				}
-			}
-		}
-	}
+      .song-progress {
+        opacity: 0;
+      }
+    }
+  }
+}
 </style>

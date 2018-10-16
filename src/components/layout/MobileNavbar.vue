@@ -9,14 +9,15 @@
 
 <script>
 export default {
-	computed: {
-		routes() {
-			return this.$router.options.routes.filter(({ meta: { link } = {} }) => link)
-		}
-	}
-}
+  computed: {
+    routes() {
+      return this.$router.options.routes.filter(
+        ({ meta: { link } = {} }) => link
+      );
+    }
+  }
+};
 </script>
 
 <style>
-
 </style>

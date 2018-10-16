@@ -5,22 +5,22 @@
 </template>
 
 <script>
-    export default {
-        name: 'loading',
-        props: ['isLoading']
-    }
+export default {
+  name: "loading",
+  props: ["isLoading"]
+};
 </script>
 
 <style>
-    .loading {
-        position: absolute;
-        top: calc(50vh - 60px);
-        left: calc(50% - 25px);
+.loading {
+  position: absolute;
+  top: calc(50vh - 60px);
+  left: calc(50% - 25px);
 
-        display: none;
-    }
+  display: none;
+}
 
-    .loading.displayed {
-        display: block;
-    }
+.loading.displayed {
+  display: block;
+}
 </style>

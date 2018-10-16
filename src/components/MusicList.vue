@@ -29,46 +29,46 @@
 </template>
 
 <script>
-    import Loading from './Loading';
+import Loading from "./Loading";
 
-    export default {
-        name: 'music-list',
-        components: { Loading },
-        props: ['selected', 'musics', 'progress']
-    }
+export default {
+  name: "music-list",
+  components: { Loading },
+  props: ["selected", "musics", "progress"]
+};
 </script>
 
 <style lang="scss">
-    .music-list {
-        padding-top: 4px;
+.music-list {
+  padding-top: 4px;
 
-        .music-title {
-            font-weight: 500;
-        }
+  .music-title {
+    font-weight: 500;
+  }
 
-        .thumbnail {
-            height: 50px !important;
-            width: 90px !important;
-            object-fit: cover;
-        }
+  .thumbnail {
+    height: 50px !important;
+    width: 90px !important;
+    object-fit: cover;
+  }
 
-        /* .selected .thumbnail {
+  /* .selected .thumbnail {
             margin-left: -3px;
         } */
 
-        .v-list__tile__avatar {
-            min-width: 105px;
-        }
+  .v-list__tile__avatar {
+    min-width: 105px;
+  }
 
-        .selected {
-            border-left: solid 3px #F67504;
-        }
+  .selected {
+    border-left: solid 3px #f67504;
+  }
 
-        .progress {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-        }
-    }
+  .progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
 </style>

@@ -12,21 +12,20 @@
 </template>
 
 <script>
-    import MusicList from '../components/MusicList';
-    import { mapState, mapActions } from 'vuex';
+import MusicList from "../components/MusicList";
+import { mapState, mapActions } from "vuex";
 
-    export default {
-        name: 'musics',
-        components: { MusicList },
-        computed: {
-            ...mapState('musics', ['musics']),
-            ...mapState('player', ['current']),
-            ...mapState('downloader', ['progress'])
-        },
-        methods: mapActions('musics', ['play'])
-    }
+export default {
+  name: "musics",
+  components: { MusicList },
+  computed: {
+    ...mapState("musics", ["musics"]),
+    ...mapState("player", ["current"]),
+    ...mapState("downloader", ["progress"])
+  },
+  methods: mapActions("musics", ["play"])
+};
 </script>
 
 <style>
-
 </style>

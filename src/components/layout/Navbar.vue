@@ -19,25 +19,27 @@
 
 <script>
 export default {
-	props: ['mini'],
-	computed: {
-		routes() {
-			return this.$router.options.routes.filter(({ meta: { link, mobileOnly } = {} }) => link && !mobileOnly)
-		},
-		isSmall() {
-			return this.$vuetify.breakpoint.width < 1264
-		}
-	},
-	watch: {
-		isSmall(value) {
-			if (value && !this.mini) this.$emit('input', true);
-		}
-	}
-}
+  props: ["mini"],
+  computed: {
+    routes() {
+      return this.$router.options.routes.filter(
+        ({ meta: { link, mobileOnly } = {} }) => link && !mobileOnly
+      );
+    },
+    isSmall() {
+      return this.$vuetify.breakpoint.width < 1264;
+    }
+  },
+  watch: {
+    isSmall(value) {
+      if (value && !this.mini) this.$emit("input", true);
+    }
+  }
+};
 </script>
 
 <style lang="scss">
-	.navbar {
-		padding-bottom: 48px; //PlayerBar heigth 
-	}
+.navbar {
+  padding-bottom: 48px; //PlayerBar heigth
+}
 </style>
