@@ -40,8 +40,7 @@
 					color="primary"
 					background-color="transparent"
 					height="2"
-					:value="position"
-					:max="duration"
+					:value="(position / duration) * 100"
 				></v-progress-linear>
 			</v-flex>
 			<v-flex v-else class="display-flex flex-0 volume">
@@ -72,10 +71,12 @@ export default {
   },
   filters: {
     duration(val) {
-      const seconds = val % 60;
-      const minutes = (val - seconds) / 60;
+      if (isFinite(val)) {
+        const seconds = val % 60;
+        const minutes = (val - seconds) / 60;
 
-      return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+      } else return "0:00";
     }
   }
 };
