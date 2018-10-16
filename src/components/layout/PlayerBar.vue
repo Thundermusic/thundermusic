@@ -148,18 +148,17 @@ $xs-bar-height: 56px;
     width: $disk-size;
     height: $disk-size;
     border-radius: 50%;
-    background-size: cover;
-    background-color: black;
+    background: center/cover black;
     position: relative;
     animation: spin 2s linear infinite;
-    box-shadow: 0 0 10px black;
+    box-shadow: 0 0 5px black;
 
     &.paused {
       animation-play-state: paused;
     }
 
     .inner {
-      box-shadow: 0 0 5px black inset;
+      box-shadow: 0 0 2.5px black inset;
       position: absolute;
       border-radius: 50%;
       top: ($disk-size - $inner-size)/2;
