@@ -83,7 +83,9 @@ function sendMessage(message) {
 }
 
 export async function download(song, progressFn) {
-	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+	if ('serviceWorker' in navigator) {
+		await navigator.serviceWorker.ready;
+
 		const url = `/musics/${song.id}`;
 
 		const { data: hasDownloaded } = await sendMessage({
