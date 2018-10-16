@@ -22,10 +22,10 @@
         <music-list :musics="results" :selected="selected" @select="select"/>
 
         <v-layout column class="controls" v-show="selected.length">
-            <v-btn fab icon dark color="green" @click="downloadAll">
+            <v-btn fab dark color="green" @click="downloadAll">
                 <v-icon>cloud_download</v-icon>
             </v-btn>
-            <v-btn fab icon dark color="red" @click="selected = []">
+            <v-btn fab dark color="red" @click="selected = []">
                 <v-icon>select_all</v-icon>
             </v-btn>
         </v-layout>
@@ -100,6 +100,10 @@ export default {
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
+
+    .v-btn__content {
+      height: unset;
+    }
   }
 }
 </style>
