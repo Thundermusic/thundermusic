@@ -27,7 +27,7 @@
     import MusicList from '../components/MusicList';
     import Loading from "../components/Loading";
 
-    import { search, addDuration } from '../youtube/search'
+    import { search } from '../platform/web'
 
     export default {
         name: 'search',
@@ -49,10 +49,9 @@
                 search(this.query)
                     .then(results => {
                         this.results = results;
-                        addDuration(results);
                         this.searching = false;                        
                     }, (e) => {
-                        this.searching = false
+                        this.searching = false;
                         throw e;
                     })
             },
@@ -62,7 +61,7 @@
                     this.selected.splice(index, 1)
                 else
                     this.selected.push(music.id)
-                this.$store.dispatch('download', music)
+                this.$store.dispatch('downloader/download', music)
             }
         }
     }
@@ -74,7 +73,7 @@
 
         .input {
             position: fixed;
-            top: 64px;
+            margin-top: -56px;
             width: 100%;
             z-index: 1;
             background: white;

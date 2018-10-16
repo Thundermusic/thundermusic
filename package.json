@@ -46,6 +46,9 @@
     },
     "parserOptions": {
       "parser": "babel-eslint"
+    },
+    "globals": {
+      "workbox": true
     }
   },
   "postcss": {

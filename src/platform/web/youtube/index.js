@@ -50,7 +50,7 @@ function parseFormats(info) {
 export async function getFormat(id) {
 	const body = await fetch(`${CORS_PROXY}https://www.youtube.com/embed/${id}?hl=en`)
 	.then(res => res.text())
-	const config = JSON.parse(between(body, 't.setConfig({\'PLAYER_CONFIG\': ', '},\'') + '}')
+	const config = JSON.parse(between(body, "yt.setConfig({'PLAYER_CONFIG': ", "})"))
 	const html5player = config.assets.js
 
 	// Fetch early
@@ -82,7 +82,7 @@ function sendMessage(message) {
 	return new Promise(resolve => channel.port2.onmessage = ({ data }) => resolve({ data, port: channel.port2 }))
 }
 
-export async function downloadFromYoutube(song, progressFn) {
+export async function download(song, progressFn) {
 	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
 		const url = `/musics/${song.id}`;
 
@@ -102,7 +102,7 @@ export async function downloadFromYoutube(song, progressFn) {
 	}
 }
 
-export async function fetchToFile(format, { id, title, thumbnail }, progressFn) {
+export async function fetchToFile(format, { id, /* title, thumbnail */ }, progressFn) {
 	const request = CORS_PROXY + format.url
 
 	/*const registration = await navigator.serviceWorker.ready;

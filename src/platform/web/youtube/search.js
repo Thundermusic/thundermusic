@@ -14,9 +14,10 @@ function convertTime(duration) {
 }
 
 export async function search(query) {
-	const results = await fetch(`${API_URL}/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=50&type=video&key=${YOUTUBE_API_KEY}`)
+	const { items } = await fetch(`${API_URL}/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=50&type=video&key=${YOUTUBE_API_KEY}`)
 	.then(res => res.json())
-	return results.items.map(({ id: { videoId }, snippet: { title, channelTitle: channel, thumbnails: { default: { url: thumbnail }} }}) => ({
+	console.log(items)
+	const results = items.map(({ id: { videoId }, snippet: { title, channelTitle: channel, thumbnails: { high: { url: thumbnail }} }}) => ({
 		id: videoId,
 		title,
 		channel,
@@ -26,11 +27,13 @@ export async function search(query) {
 			videoId
 		},
 	}));
+	await addDuration(results)
+	return results
 }
 
-export async function addDuration(searchResults) {
+async function addDuration(searchResults) {
 	const ids = searchResults.map(({ youtube: { videoId }}) => videoId)
 	const { items } = await fetch(`${API_URL}/videos?part=contentDetails&id=${ids.join(',')}&key=${YOUTUBE_API_KEY}`)
-	.then(res => res.json())
+		.then(res => res.json())
 	items.forEach(({ contentDetails: { duration } }, i) => searchResults[i].duration = convertTime(duration))
 }

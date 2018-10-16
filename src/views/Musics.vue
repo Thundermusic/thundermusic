@@ -1,6 +1,6 @@
 <template>
     <div id="musics">
-        <music-list :musics="musics" :selected="current && [current.id]" @select="play">
+        <music-list :musics="musics" :selected="current && [current.id]" @select="music => play({ music })" :progress="progress">
             <template slot-scope="{ music }">
                 <v-list-tile-action>
                     <v-icon color="grey lighten-1">add</v-icon>
@@ -18,8 +18,12 @@
     export default {
         name: 'musics',
         components: { MusicList },
-        computed: mapState(['musics', 'current']),
-        methods: mapActions(['play'])
+        computed: {
+            ...mapState('musics', ['musics']),
+            ...mapState('player', ['current']),
+            ...mapState('downloader', ['progress'])
+        },
+        methods: mapActions('musics', ['play'])
     }
 </script>
 

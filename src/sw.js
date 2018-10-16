@@ -24,7 +24,7 @@ self.addEventListener('message', (event) => {
 			DOWNLOADING.set(to, res)
 			event.ports[0].postMessage(to)
 			await cache.put(to, res.clone())
-			port.postMessage(1)
+			event.ports[0].postMessage(1)
 			DOWNLOADING.delete(to)
 		})())
 		break;
@@ -60,12 +60,11 @@ function monitorProgress(response, port, size) {
 			async start(controller) {
 				try {
 					let loaded = 0;
-					while(true) {
+					for(;;) {
 						const { done, value } = await reader.read()
 						if (done) break;
 						controller.enqueue(value)
 						loaded += value.byteLength
-						console.log(loaded, size)
 						port.postMessage(loaded / size)
 					}
 					controller.close()

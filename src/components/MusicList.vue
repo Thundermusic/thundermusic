@@ -13,13 +13,13 @@
                     </v-list-tile-content>
                     <slot :music="music" :index="index"></slot>
                     <v-progress-linear
-                        v-if="music.progress !== undefined"
+                        v-if="progress && music.id in progress"
                         class="ma-0 progress"
                         color="primary"
                         background-color="transparent"
                         height="2"
-                        :value="music.progress"
-                        :indeterminate="music.progress === null"
+                        :value="progress[music.id]"
+                        :indeterminate="!progress[music.id]"
                     ></v-progress-linear>
                 </v-list-tile>
                 <v-divider v-if="index + 1 < musics.length" :key="`divider-${index}`"></v-divider>
@@ -34,7 +34,7 @@
     export default {
         name: 'music-list',
         components: { Loading },
-        props: ['selected', 'musics']
+        props: ['selected', 'musics', 'progress']
     }
 </script>
 

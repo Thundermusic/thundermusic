@@ -30,9 +30,6 @@ export default {
             mini: false,
         }
     },
-    mounted() {
-        this.$store.dispatch('load');
-    },
     components: {
         PlayerBar,
         MobileNavbar,
