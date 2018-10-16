@@ -123,8 +123,8 @@ export default {
 			display: inline-block;
 		}
 
-		$disk-size: 40px;
-		$inner-size: 12px;
+		$disk-size: 32px;
+		$inner-size: 10px;
 
 		@keyframes spin {
 			from {
