@@ -127,6 +127,9 @@ export default new Vuex.Store({
         },
         setVolume(state, volume) {
             state.volume = volume;
+        },
+        setProgress(state, { id, progress }) {
+            Vue.set(state.musics.find((music) => music.id === id), 'progress', progress === 100 ? undefined : progress)
         }
     },
     actions: {
@@ -187,10 +190,16 @@ export default new Vuex.Store({
         {
             if (song.youtube) {
                 console.log('Youtube')
-                const url = downloadFromYoutube(song)
+
+                const url = downloadFromYoutube(song, (progress) => {
+                    progress *= 100;
+                    commit('setProgress', { id: song.id, progress })
+                })
+
                 commit('push', {
                     ...song,
-                    url
+                    url,
+                    progress: null
                 })
                 url.then(url => {
                     localStorage.setItem(

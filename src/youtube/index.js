@@ -1,6 +1,7 @@
 import { parse } from "querystring"
 import FORMATS from "./formats"
 import { getTokens, decipherFormat } from "./sig"
+import url from "url"
 
 const CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
 
@@ -78,10 +79,10 @@ function sendMessage(message) {
 
 	navigator.serviceWorker.controller.postMessage(message, [channel.port1])
 
-	return new Promise(resolve => channel.port2.onmessage = resolve)
+	return new Promise(resolve => channel.port2.onmessage = ({ data }) => resolve({ data, port: channel.port2 }))
 }
 
-export async function downloadFromYoutube(song) {
+export async function downloadFromYoutube(song, progressFn) {
 	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
 		const url = `/musics/${song.id}`;
 
@@ -93,17 +94,18 @@ export async function downloadFromYoutube(song) {
 		if (hasDownloaded) {
 			return url;
 		} else {
-			return fetchToFile(await getFormat(song.id), song)
+			return fetchToFile(await getFormat(song.id), song, progressFn)
 		}
 	} else {
+		console.warn("Service Worker not enabled")
 		return (await getFormat(song.id)).url
 	}
 }
 
-export async function fetchToFile(format, { id, title, thumbnail }) {
+export async function fetchToFile(format, { id, title, thumbnail }, progressFn) {
 	const request = CORS_PROXY + format.url
 
-	const registration = await navigator.serviceWorker.ready;
+	/*const registration = await navigator.serviceWorker.ready;
 
 	if (registration.backgroundFetch && ! (await registration.backgroundFetch.get(id))) {
 		await registration.backgroundFetch.fetch(id, [
@@ -117,13 +119,16 @@ export async function fetchToFile(format, { id, title, thumbnail }) {
 		});
 	} else {
 		console.log("Background Fetch not available")
-	}
+	}*/
 
-	const { data } = await sendMessage({
+	const { data, port } = await sendMessage({
 		type: 'downloadTo',
 		from: request,
-		to: `/musics/${id}`
+		to: `/musics/${id}`,
+		size: +(format.clen || url.parse(request, true).query.clen)
 	})
+
+	port.onmessage = ({ data }) => progressFn(data)
 
 	return data;
 }

@@ -17,25 +17,69 @@ const DOWNLOADING = new Map();
 self.addEventListener('message', (event) => {
 	switch(event.data.type) {
 		case 'downloadTo':
-			event.waitUntil((async () => {
-				const { to, from } = event.data
-				const res = await fetch(from)
-				const cache = await caches.open("musics")
-				DOWNLOADING.set(to, res)
-				event.ports[0].postMessage(to)
-				await cache.put(to, res.clone())
-				DOWNLOADING.delete(to)
-			})())
-			break;
+		event.waitUntil((async () => {
+			const { to, from, size } = event.data
+			const cache = await caches.open("musics")
+			const res = monitorProgress(await fetch(from), event.ports[0], size)
+			DOWNLOADING.set(to, res)
+			event.ports[0].postMessage(to)
+			await cache.put(to, res.clone())
+			port.postMessage(1)
+			DOWNLOADING.delete(to)
+		})())
+		break;
 		case 'hasDownloaded':
-			event.waitUntil((async () => {
-				const { url } = event.data
-				const cache = await caches.open("musics")
-				event.ports[0].postMessage(!! (await cache.match(url)))
-			})())
-			break;
+		event.waitUntil((async () => {
+			const { url } = event.data
+			const cache = await caches.open("musics")
+			event.ports[0].postMessage(!! (await cache.match(url)))
+		})())
+		break;
 	}
 });
+
+function monitorProgress(response, port, size) {
+	if (!response.body) {
+		console.warn("ReadableStream is not yet supported in this browser. See https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream")
+		return response;
+	}
+
+	if (!response.ok) {
+		// HTTP error code response
+		return response;
+	}
+
+	if (!isFinite(size)) {
+		return response;
+	}
+
+	const reader = response.body.getReader();
+
+	return new Response(
+		new ReadableStream({
+			async start(controller) {
+				try {
+					let loaded = 0;
+					while(true) {
+						const { done, value } = await reader.read()
+						if (done) break;
+						controller.enqueue(value)
+						loaded += value.byteLength
+						console.log(loaded, size)
+						port.postMessage(loaded / size)
+					}
+					controller.close()
+				} catch(e) {
+					controller.error(e)
+				}
+			},
+
+			cancel(reason) {
+				reader.cancel(reason)
+			}
+		})
+	)
+}
 
 workbox.routing.registerRoute(
 	new RegExp('/musics/'),

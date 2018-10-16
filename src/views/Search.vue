@@ -1,12 +1,25 @@
 <template>
     <div id="search">
-        <Loading :isLoading="searching" />
+        <loading :isLoading="searching" />
 
-        <v-form @submit.prevent="search">
-            <v-text-field solo :readonly="searching" v-model="query" autofocus autocapitalize="off" autocomplete="off" spellcheck="false" autocorrect="off" placeholder="Rechercher..." append-icon="search" />
+        <v-form @submit.prevent="search" class="input">
+            <v-text-field
+              hide-details
+              :readonly="searching"
+              box
+              single-line
+              v-model="query"
+              autofocus
+              autocapitalize="off"
+              autocomplete="off"
+              spellcheck="false"
+              autocorrect="off"
+              placeholder="Rechercher..."
+              append-icon="search"
+            />
         </v-form>
 
-        <MusicList :content="results" :download="true" />
+        <music-list :musics="results" :selected="selected" @select="select"/>
     </div>
 </template>
 
@@ -24,12 +37,12 @@
             return {
                 searching: false,
                 query: '',
-                results: []
+                results: [],
+                selected: []
             }
         },
         methods: {
             search() {
-
                 this.results = [];
                 this.searching = true;
 
@@ -42,13 +55,29 @@
                         this.searching = false
                         throw e;
                     })
+            },
+            select(music) {
+                const index = this.selected.indexOf(music.id)
+                if (index >= 0)
+                    this.selected.splice(index, 1)
+                else
+                    this.selected.push(music.id)
+                this.$store.dispatch('download', music)
             }
         }
     }
 </script>
 
-<style>
-    #search .music-list {
-        margin-top: -31px;
+<style lang="scss">
+    #search {
+        padding-top: 56px;
+
+        .input {
+            position: fixed;
+            top: 64px;
+            width: 100%;
+            z-index: 1;
+            background: white;
+        }
     }
 </style>
