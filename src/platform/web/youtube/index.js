@@ -122,7 +122,10 @@ function waitForController() {
 }
 
 export async function download(song, progressFn) {
-  if ("serviceWorker" in navigator) {
+  if (
+    "serviceWorker" in navigator &&
+    (await navigator.serviceWorker.getRegistration())
+  ) {
     await waitForController();
 
     const url = `/musics/${song.id}`;
