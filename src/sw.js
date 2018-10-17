@@ -91,7 +91,7 @@ workbox.routing.registerRoute(new RegExp("/musics/"), async ({ event }) => {
   const urlEnd = url.slice(url.indexOf("/musics/"));
 
   if (DOWNLOADING.has(urlEnd)) {
-    return DOWNLOADING.get(urlEnd);
+    return DOWNLOADING.get(urlEnd).clone();
   }
   const cache = await caches.open("musics");
   const res = await cache.match(event.request);
