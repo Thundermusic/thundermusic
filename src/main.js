@@ -1,3 +1,11 @@
+import * as Sentry from "@sentry/browser";
+
+const dsn = process.env.VUE_APP_SENTRY_DSN;
+
+if (dsn) {
+  Sentry.init({ dsn });
+}
+
 import "@babel/polyfill";
 import Vue from "vue";
 import "./vuetify";
