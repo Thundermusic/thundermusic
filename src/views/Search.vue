@@ -51,7 +51,7 @@ export default {
       selected: []
     };
   },
-  computeds: mapGetters("musics", ["hasMusic"]),
+  computed: mapGetters("musics", ["hasMusic"]),
   methods: {
     search() {
       this.results = [];
