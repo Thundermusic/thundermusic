@@ -20,9 +20,7 @@ function mapSnippets(items) {
       snippet: {
         title,
         channelTitle: channel,
-        thumbnails: {
-          high: { url: thumbnail }
-        },
+        thumbnails: { high: { url: thumbnail } = {} } = {},
         resourceId: { videoId: rIdVideoId } = {}
       }
     }) => ({
