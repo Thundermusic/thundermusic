@@ -18,6 +18,8 @@ import {
   VSlider,
   VNavigationDrawer,
   VSubheader,
+  VDialog,
+  VExpansionPanel,
   transitions
 } from "vuetify";
 
@@ -43,6 +45,8 @@ Vue.use(Vuetify, {
     VSlider,
     VNavigationDrawer,
     VSubheader,
+    VDialog,
+    VExpansionPanel,
 
     transitions
   },

@@ -12,15 +12,47 @@
 				</v-list-tile-action>
 				<v-list-tile-content>{{ route.meta.name_fr }}</v-list-tile-content>
 			</v-list-tile>
-			<v-subheader>Playlists</v-subheader>
+			<v-subheader>
+        Playlists
+        <v-btn
+          color="primary"
+          icon
+          flat
+          dark
+          absolute
+          right
+          small
+          @click="create = true"
+        >
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-subheader>
+			<v-list-tile
+				v-for="playlist in playlists"
+				:key="playlist.id"
+				:to="{ name: 'playlist', params: { playlist: playlist.id }}"
+        class="playlist"
+			>
+				<v-list-tile-content>{{ playlist.title }}</v-list-tile-content>
+			</v-list-tile>
 		</v-list>
+    <create-playlist-dialog v-model="create"/>
 	</v-navigation-drawer>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import CreatePlaylistDialog from "../CreatePlaylistDialog";
+
 export default {
   props: ["mini"],
+  data() {
+    return {
+      create: false
+    };
+  },
   computed: {
+    ...mapState("musics", ["playlists"]),
     routes() {
       return this.$router.options.routes.filter(
         ({ meta: { link, mobileOnly } = {} }) => link && !mobileOnly
@@ -34,6 +66,9 @@ export default {
     isSmall(value) {
       if (value && !this.mini) this.$emit("input", true);
     }
+  },
+  components: {
+    CreatePlaylistDialog
   }
 };
 </script>
@@ -41,5 +76,11 @@ export default {
 <style lang="scss">
 .navbar {
   padding-bottom: 48px; //PlayerBar heigth
+
+  .playlist > .v-list__tile {
+    height: 32px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 </style>

@@ -5,8 +5,12 @@
                 <v-icon>menu</v-icon>
             </v-toolbar-side-icon>
             <img id="icon" src="./assets/icon.png" width="35"/>
-            <v-toolbar-title>{{ $route.meta.name_fr }}</v-toolbar-title>
+            <v-toolbar-title>
+              {{ $route.meta.name_fr }}
+              <portal-target name="title" />
+            </v-toolbar-title>
             <v-spacer></v-spacer>
+            <portal-target name="toolbar" />
         </v-toolbar>
         <v-content>
             <router-view/>
@@ -44,5 +48,9 @@ html {
 
 .v-content {
   margin-bottom: 48px; //PlayerBar heigth
+}
+
+.v-list__tile--active {
+  border-left: solid 3px #f67504;
 }
 </style>

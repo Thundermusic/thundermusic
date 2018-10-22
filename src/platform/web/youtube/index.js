@@ -142,7 +142,9 @@ export async function download(song, progressFn) {
     }
   } else {
     console.warn("Service Worker not enabled");
-    return (await getFormat(song.id)).url;
+    const { url } = await getFormat(song.id);
+    progressFn(1);
+    return url;
   }
 }
 

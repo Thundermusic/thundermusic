@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import MusicList from "../components/MusicList";
 import Loading from "../components/Loading";
 
@@ -50,6 +51,7 @@ export default {
       selected: []
     };
   },
+  computeds: mapGetters("musics", ["hasMusic"]),
   methods: {
     search() {
       this.results = [];
@@ -75,7 +77,8 @@ export default {
       this.selected
         .map(id => this.results.find(music => music.id === id))
         .forEach(music => {
-          this.$store.dispatch("downloader/download", music);
+          if (!this.hasMusic(music))
+            this.$store.dispatch("downloader/download", music);
         });
       this.$router.push({ name: "musics" });
     }

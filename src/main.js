@@ -30,6 +30,10 @@ Vue.use(VueVirtualScroller);
 Vue.component("virtual-scroller", VirtualScroller);
 Vue.component("recycle-list", RecycleList);
 
+import PortalVue from "portal-vue";
+
+Vue.use(PortalVue);
+
 new Vue({
   render: h => h(App),
   router,

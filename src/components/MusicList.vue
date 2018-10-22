@@ -2,7 +2,7 @@
     <v-list class="music-list pa-0" two-line>
         <recycle-list :items="musics" :item-height="73">
             <template slot-scope="{ item: music, index }">
-                <v-list-tile avatar ripple :key="index" :class="{ 'selected': selected.includes(music.id) }" @click="$emit('select', music)">
+                <v-list-tile avatar ripple :key="index" :value="selected.includes(music.id)" @click="$emit('select', music)">
                     <v-list-tile-avatar :tile="true" size="auto">
                         <img class="thumbnail" :src="music.thumbnail || require('../assets/thumbnail_default.png')" />
                     </v-list-tile-avatar>
@@ -58,10 +58,6 @@ export default {
 
   .v-list__tile__avatar {
     min-width: 105px;
-  }
-
-  .selected {
-    border-left: solid 3px #f67504;
   }
 
   .progress {

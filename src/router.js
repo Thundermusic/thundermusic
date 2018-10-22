@@ -42,6 +42,12 @@ export const routes = [
     }
   },
   {
+    path: "/playlists/:playlist",
+    name: "playlist",
+    component: Musics,
+    props: true
+  },
+  {
     path: "/settings",
     component: Settings,
     name: "settings",

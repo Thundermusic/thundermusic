@@ -1,10 +1,10 @@
+import Vue from "vue";
 import { addHandlers } from "../../platform/web";
-
-const GLOBAL_PLAYLIST = Symbol("global");
 
 export const state = {
   musics: [],
-  currentPlaylist: GLOBAL_PLAYLIST,
+  playlists: {},
+  currentPlaylist: undefined,
   currentPlaylistIndex: 0
 };
 
@@ -12,7 +12,9 @@ const types = {
   ADD_MUSIC: "ADD_MUSIC",
   SET_MUSICS: "SET_MUSICS",
   SET_PLAYLIST: "SET_PLAYLIST",
-  SET_PLAYLIST_INDEX: "SET_PLAYLIST_INDEX"
+  SET_PLAYLIST_INDEX: "SET_PLAYLIST_INDEX",
+  ADD_PLAYLIST: "ADD_PLAYLIST",
+  SET_PLAYLISTS: "SET_PLAYLISTS"
 };
 
 export const mutations = {
@@ -27,20 +29,26 @@ export const mutations = {
   },
   [types.SET_PLAYLIST_INDEX](state, index) {
     state.currentPlaylistIndex = index;
+  },
+  [types.ADD_PLAYLIST](state, playlist) {
+    Vue.set(state.playlists, playlist.id, playlist);
+  },
+  [types.SET_PLAYLISTS](state, playlists) {
+    state.playlists = playlists;
   }
 };
 
 export const getters = {
-  playlists({ musics }) {
-    const playlists = {
-      [GLOBAL_PLAYLIST]: musics
-    };
-
-    for (const music of musics) {
-      if (music.playlist) playlists[music.playlist] = music;
+  getMusicsByPlaylist: ({ musics, playlists }) => playlist => {
+    if (playlist === undefined) {
+      return musics;
+    } else {
+      const playlistInfos = playlists[playlist];
+      return musics.filter(({ id }) => playlistInfos.musics.includes(id));
     }
-
-    return playlists;
+  },
+  hasMusic: ({ musics }) => ({ id }) => {
+    return !!musics.find(music => music.id === id);
   }
 };
 
@@ -48,21 +56,22 @@ export const actions = {
   add({ commit }, music) {
     commit(types.ADD_MUSIC, music);
   },
-  play({ dispatch, getters, commit }, { music, playlist = GLOBAL_PLAYLIST }) {
+  play({ dispatch, getters, commit }, { music, playlist }) {
     dispatch("player/setMusic", music, { root: true });
     commit(types.SET_PLAYLIST, playlist);
     commit(
       types.SET_PLAYLIST_INDEX,
-      getters.playlists[playlist].indexOf(music)
+      getters.getMusicsByPlaylist(playlist).indexOf(music)
     );
   },
   next({ dispatch, state, getters, commit }) {
     let { currentPlaylistIndex: index, currentPlaylist: playlist } = state;
 
+    const musics = getters.getMusicsByPlaylist(playlist);
     index++;
-    index %= getters.playlists[playlist].length;
+    index %= musics.length;
 
-    dispatch("player/setMusic", getters.playlists[playlist][index], {
+    dispatch("player/setMusic", musics[index], {
       root: true
     });
     commit(types.SET_PLAYLIST_INDEX, index);
@@ -70,17 +79,24 @@ export const actions = {
   previous({ dispatch, state, getters, commit }) {
     let { currentPlaylistIndex: index, currentPlaylist: playlist } = state;
 
+    const musics = getters.getMusicsByPlaylist(playlist);
     index--;
-    index %= getters.playlists[playlist].length;
+    index %= musics.length;
 
-    dispatch("player/setMusic", getters.playlists[playlist][index], {
+    dispatch("player/setMusic", musics[index], {
       root: true
     });
     commit(types.SET_PLAYLIST_INDEX, index);
   },
+  addPlaylist({ commit, state }, playlist) {
+    commit(types.ADD_PLAYLIST, playlist);
+    localStorage.setItem("playlists", JSON.stringify(state.playlists));
+  },
   load({ commit, dispatch }) {
     const musics = localStorage.getItem("musics");
     if (musics) commit(types.SET_MUSICS, JSON.parse(musics));
+    const playlists = localStorage.getItem("playlists");
+    if (playlists) commit(types.SET_PLAYLISTS, JSON.parse(playlists));
 
     addHandlers({
       onNext() {
