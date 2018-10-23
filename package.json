@@ -6,12 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "cordova-serve-android": "vue-cli-service cordova-serve-android",
-    "cordova-build-android": "vue-cli-service cordova-build-android",
-    "cordova-serve-ios": "vue-cli-service cordova-serve-ios",
-    "cordova-build-ios": "vue-cli-service cordova-build-ios",
-    "cordova-serve-browser": "vue-cli-service cordova-serve-browser",
-    "cordova-build-browser": "vue-cli-service cordova-build-browser"
+    "cordova-serve-android": "cross-env BASE_URL='' vue-cli-service cordova-serve-android",
+    "cordova-build-android": "cross-env BASE_URL='' vue-cli-service cordova-build-android",
+    "cordova-serve-ios": "cross-env BASE_URL='' vue-cli-service cordova-serve-ios",
+    "cordova-build-ios": "cross-env BASE_URL='' vue-cli-service cordova-build-ios",
+    "cordova-serve-browser": "cross-env BASE_URL='' vue-cli-service cordova-serve-browser",
+    "cordova-build-browser": "cross-env BASE_URL='' vue-cli-service cordova-build-browser"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",
@@ -33,6 +33,7 @@
     "@vue/cli-service": "^3.0.1",
     "@vue/eslint-config-prettier": "^3.0.5",
     "babel-plugin-transform-imports": "^1.5.0",
+    "cross-env": "^5.2.0",
     "husky": "^1.1.2",
     "lint-staged": "^7.3.0",
     "node-sass": "^4.9.3",

@@ -1,6 +1,7 @@
-module.exports = {
-  baseUrl: "",
+const { BASE_URL = "/" } = process.env;
 
+module.exports = {
+  baseUrl: BASE_URL,
   pwa: {
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
