@@ -29,12 +29,10 @@ export async function addHandlers({
     onNext && navigator.mediaSession.setActionHandler("nexttrack", onNext);
     onPrevious &&
       navigator.mediaSession.setActionHandler("previoustrack", onPrevious);
-    /*		navigator.mediaSession.setActionHandler("pause", () =>
-		);
-		navigator.mediaSession.setActionHandler("seekbackward", () =>
-		);
-		navigator.mediaSession.setActionHandler("seekforward", () =>
-		); */
+    /*
+		navigator.mediaSession.setActionHandler("seekbackward", () => {});
+		navigator.mediaSession.setActionHandler("seekforward", () => {});
+    */
   }
 }
 
