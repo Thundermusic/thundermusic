@@ -60,5 +60,6 @@ export const routes = [
 ];
 
 export default new Router({
+  mode: process.env.CORDOVA_PLATFORM ? "hash" : "history",
   routes
 });

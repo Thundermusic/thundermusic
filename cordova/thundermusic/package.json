@@ -1,0 +1,11 @@
+{
+  "name": "cordova-plugin-thundermusic",
+  "version": "1.0.0",
+  "cordova": {
+    "id": "cordova-plugin-thundermusic",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  }
+}

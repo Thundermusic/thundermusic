@@ -1,5 +1,6 @@
 module.exports = {
-  baseUrl: ".",
+  baseUrl: "",
+
   pwa: {
     workboxPluginMode: "InjectManifest",
     workboxOptions: {
@@ -13,6 +14,8 @@ module.exports = {
       maskIcon: null,
       msTileImage: "img/icons/msapplication-icon-144x144.png"
     }
+  },
+  pluginOptions: {
+    cordovaPath: "cordova"
   }
 };
-3;

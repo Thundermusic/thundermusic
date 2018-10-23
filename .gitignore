@@ -3,3 +3,9 @@ node_modules/
 dist/
 .idea/
 thundermusic-android/app/src/main/assets/www/*
+
+# Cordova
+/cordova/www
+/cordova/platforms
+/cordova/plugins
+/public/cordova.js

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    id="cordova-plugin-thundermusic"
+    version="1.0.0">
+    <name>Thundermusic</name>
+    <description>Cordova Thundermusic Plugin</description>
+    <license>Apache 2.0</license>
+
+    <engines>
+        <engine name="cordova" version=">=7.1.0"/>
+        <engine name="cordova-android" version=">=6.3.0" />
+    </engines>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Thundermusic">
+                <param name="android-package" value="fr.litarvan.thundermusic.core.Thundermusic"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="application">
+            <service android:name="fr.litarvan.thundermusic.core.DownloadService" />
+            <service android:name="fr.litarvan.thundermusic.core.ThundermusicService" />
+        </config-file>
+
+        <source-file src="src/android/DownloadManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/DownloadService.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/EventManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicControlBroadcastReceiver.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicControlNotification.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicPlayer.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/Song.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/SongToDownload.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/Thundermusic.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/ThundermusicService.java" target-dir="src/fr/litarvan/thundermusic/core" />
+      </platform>
+
+     <!-- ios -->
+     <platform name="ios">
+         <config-file target="config.xml" parent="/*">
+             <feature name="Thundermusic">
+                 <param name="ios-package" value="Thundermusic" />
+             </feature>
+         </config-file>
+     </platform>
+</plugin>
