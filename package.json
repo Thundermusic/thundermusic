@@ -22,7 +22,7 @@
     "roboto-fontface": "*",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
-    "vue-virtual-scroller": "^0.12.2",
+    "vue-virtual-scroller": "^1.0.0-beta.2",
     "vuetify": "^1.2.0",
     "vuex": "^3.0.1"
   },

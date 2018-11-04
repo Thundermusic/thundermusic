@@ -1,9 +1,10 @@
-export { search, getPlaylistContent, getPlaylistInfos } from "./youtube/api";
-export { download } from "./youtube";
+export { getPlaylistContent, getPlaylistInfos } from "./youtube/api";
+export { default as providers } from "./providers";
 
 import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutube";
 
 export const playlistComponents = [ImportFromYoutube];
+
 const audio = new Audio();
 
 export async function addHandlers({

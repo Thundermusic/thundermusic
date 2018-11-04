@@ -1,7 +1,8 @@
+import { decorateDownload } from "../sw-client";
+import { search } from "./api";
 import { parse } from "querystring";
 import FORMATS from "./formats";
 import { getTokens, decipherFormat } from "./sig";
-import url from "url";
 
 const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
@@ -50,7 +51,7 @@ function parseFormats(info) {
   return formats.map(addFormatMeta);
 }
 
-export async function getFormat(id) {
+async function getFormat(id) {
   const body = await fetch(
     `${CORS_PROXY}https://www.youtube.com/embed/${id}?hl=en`
   ).then(res => res.text());
@@ -92,93 +93,16 @@ export async function getFormat(id) {
   return toDownload;
 }
 
-function sendMessage(message) {
-  const channel = new MessageChannel();
-
-  navigator.serviceWorker.controller.postMessage(message, [channel.port1]);
-
-  return new Promise(
-    resolve =>
-      (channel.port2.onmessage = ({ data }) =>
-        resolve({ data, port: channel.port2 }))
-  );
+function download(song) {
+  return getFormat(song.id).then(({ url, clen }) => ({
+    url,
+    size: +(clen || new URL(url).searchParams.get("clen"))
+  }));
 }
 
-function waitForController() {
-  return new Promise(resolve => {
-    if (navigator.serviceWorker.controller) resolve();
-    else {
-      const handler = () => {
-        resolve();
-        navigator.serviceWorker.removeEventListener(
-          "controllerchange",
-          handler
-        );
-      };
-
-      navigator.serviceWorker.addEventListener("controllerchange", handler);
-    }
-  });
-}
-
-export async function download(song, progressFn) {
-  if (
-    "serviceWorker" in navigator &&
-    (await navigator.serviceWorker.getRegistration())
-  ) {
-    await waitForController();
-
-    const url = `/musics/${song.id}`;
-
-    const { data: hasDownloaded } = await sendMessage({
-      type: "hasDownloaded",
-      url
-    });
-
-    if (hasDownloaded) {
-      return url;
-    } else {
-      return fetchToFile(await getFormat(song.id), song, progressFn);
-    }
-  } else {
-    console.warn("Service Worker not enabled");
-    const { url } = await getFormat(song.id);
-    progressFn(1);
-    return url;
-  }
-}
-
-export async function fetchToFile(
-  format,
-  { id /* title, thumbnail */ },
-  progressFn
-) {
-  const request = CORS_PROXY + format.url;
-
-  /*const registration = await navigator.serviceWorker.ready;
-
-	if (registration.backgroundFetch && ! (await registration.backgroundFetch.get(id))) {
-		await registration.backgroundFetch.fetch(id, [
-			request
-		], {
-			title,
-			downloadTotal: format.clen,
-			icons: [{
-				src: thumbnail
-			}]
-		});
-	} else {
-		console.log("Background Fetch not available")
-	}*/
-
-  const { data, port } = await sendMessage({
-    type: "downloadTo",
-    from: request,
-    to: `/musics/${id}`,
-    size: +(format.clen || url.parse(request, true).query.clen)
-  });
-
-  port.onmessage = ({ data }) => progressFn(data);
-
-  return data;
-}
+export default {
+  name: "Youtube",
+  icon: require("../../../assets/youtube_icon.svg"),
+  search,
+  download: decorateDownload(download)
+};

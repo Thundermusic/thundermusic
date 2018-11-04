@@ -1,8 +1,8 @@
 <template>
     <v-list class="music-list pa-0" two-line>
-        <recycle-list :items="musics" :item-height="73">
+        <recycle-scroller :items="musics" :item-height="73">
             <template slot-scope="{ item: music, index }">
-                <v-list-tile avatar ripple :key="index" :value="selected.includes(music.id)" @click="$emit('select', music)">
+                <v-list-tile avatar ripple :value="selected.includes(music.id)" @click="$emit('select', music)">
                     <v-list-tile-avatar :tile="true" size="auto">
                         <img class="thumbnail" :src="music.thumbnail || require('../assets/thumbnail_default.png')" />
                     </v-list-tile-avatar>
@@ -11,7 +11,6 @@
                         <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
                         <v-list-tile-sub-title>{{ music.duration || '?' }}</v-list-tile-sub-title>
                     </v-list-tile-content>
-                    <slot :music="music" :index="index"></slot>
                     <v-progress-linear
                         v-if="progress && music.id in progress"
                         class="ma-0 progress"
@@ -22,18 +21,19 @@
                         :indeterminate="!progress[music.id]"
                     ></v-progress-linear>
                 </v-list-tile>
-                <v-divider v-if="index + 1 < musics.length" :key="`divider-${index}`"></v-divider>
+                <v-divider v-if="index + 1 < musics.length"></v-divider>
             </template>
-        </recycle-list>
+        </recycle-scroller>
     </v-list>
 </template>
 
 <script>
 import Loading from "./Loading";
+import RecycleScroller from "./RecycleScroller";
 
 export default {
   name: "music-list",
-  components: { Loading },
+  components: { Loading, RecycleScroller },
   props: ["selected", "musics", "progress"]
 };
 </script>
@@ -51,10 +51,6 @@ export default {
     width: 90px !important;
     object-fit: cover;
   }
-
-  /* .selected .thumbnail {
-            margin-left: -3px;
-        } */
 
   .v-list__tile__avatar {
     min-width: 105px;

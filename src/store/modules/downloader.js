@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { download } from "../../platform/web";
+import { providers } from "../../platform/web";
 
 export const state = {
   progress: {}
@@ -20,8 +20,8 @@ export const mutations = {
 };
 
 export const actions = {
-  download({ commit, dispatch }, music) {
-    const url = download(music, progress => {
+  download({ commit, dispatch }, { music, provider }) {
+    const url = providers[provider].download(music, progress => {
       progress *= 100;
       if (progress === 100) {
         commit(types.REMOVE_PROGRESS, music.id);

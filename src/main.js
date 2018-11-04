@@ -19,16 +19,8 @@ import router from "./router";
 import store from "./store";
 
 Vue.config.productionTip = false;
-
-import { VirtualScroller, RecycleList } from "vue-virtual-scroller";
-import VueVirtualScroller from "vue-virtual-scroller";
-
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import "./registerServiceWorker";
-
-Vue.use(VueVirtualScroller);
-Vue.component("virtual-scroller", VirtualScroller);
-Vue.component("recycle-list", RecycleList);
 
 import PortalVue from "portal-vue";
 

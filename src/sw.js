@@ -42,7 +42,11 @@ self.addEventListener("message", event => {
   }
 });
 
-function monitorProgress(response, port, size) {
+function monitorProgress(
+  response,
+  port,
+  size = +response.headers.get("content-length")
+) {
   if (!response.body) {
     console.warn(
       "ReadableStream is not yet supported in this browser. See https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream"

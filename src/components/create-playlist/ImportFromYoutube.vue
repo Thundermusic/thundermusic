@@ -45,7 +45,10 @@ export default {
 
       for (const music of musics) {
         if (!this.hasMusic(music))
-          this.$store.dispatch("downloader/download", music);
+          this.$store.dispatch("downloader/download", {
+            music,
+            provider: "youtube"
+          });
       }
 
       const id = toId(infos.title);

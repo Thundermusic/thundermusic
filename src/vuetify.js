@@ -20,6 +20,7 @@ import {
   VSubheader,
   VDialog,
   VExpansionPanel,
+  VMenu,
   transitions
 } from "vuetify";
 
@@ -47,6 +48,7 @@ Vue.use(Vuetify, {
     VSubheader,
     VDialog,
     VExpansionPanel,
+    VMenu,
 
     transitions
   },
