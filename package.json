@@ -16,7 +16,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",
     "@sentry/browser": "^4.1.1",
-    "material-design-icons-iconfont": "^3.0.3",
+    "material-design-icons-iconfont": "^4.0.2",
     "portal-vue": "^1.4.0",
     "register-service-worker": "^1.0.0",
     "roboto-fontface": "*",

@@ -12,6 +12,7 @@ export async function addHandlers({
   onPlay,
   onPause,
   onNext,
+  onEnd,
   onPrevious
 }) {
   if (onPositionChange) {
@@ -20,8 +21,8 @@ export async function addHandlers({
     });
   }
 
-  if (onNext) {
-    audio.addEventListener("ended", () => onNext());
+  if (onEnd) {
+    audio.addEventListener("ended", () => onEnd());
   }
 
   if ("mediaSession" in navigator) {

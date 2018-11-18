@@ -5,7 +5,8 @@ export const state = {
   musics: [],
   playlists: {},
   currentPlaylist: undefined,
-  currentPlaylistIndex: 0
+  currentPlaylistIndex: 0,
+  mode: "linear" // linear | loop | random
 };
 
 const types = {
@@ -14,7 +15,8 @@ const types = {
   SET_PLAYLIST: "SET_PLAYLIST",
   SET_PLAYLIST_INDEX: "SET_PLAYLIST_INDEX",
   ADD_PLAYLIST: "ADD_PLAYLIST",
-  SET_PLAYLISTS: "SET_PLAYLISTS"
+  SET_PLAYLISTS: "SET_PLAYLISTS",
+  SET_MODE: "SET_MODE"
 };
 
 export const mutations = {
@@ -35,6 +37,9 @@ export const mutations = {
   },
   [types.SET_PLAYLISTS](state, playlists) {
     state.playlists = playlists;
+  },
+  [types.SET_MODE](state, mode) {
+    state.mode = mode;
   }
 };
 
@@ -88,9 +93,29 @@ export const actions = {
     });
     commit(types.SET_PLAYLIST_INDEX, index);
   },
+  end({ state, dispatch, getters, commit }) {
+    const { currentPlaylistIndex, currentPlaylist: playlist, mode } = state;
+
+    if (mode == "linear") return dispatch("next");
+
+    const musics = getters.getMusicsByPlaylist(playlist);
+    const index =
+      mode === "random"
+        ? Math.floor(Math.random() * musics.length)
+        : currentPlaylistIndex; // loop mode
+
+    dispatch("player/setMusic", musics[index], {
+      root: true
+    });
+
+    commit(types.SET_PLAYLIST_INDEX, index);
+  },
   addPlaylist({ commit, state }, playlist) {
     commit(types.ADD_PLAYLIST, playlist);
     localStorage.setItem("playlists", JSON.stringify(state.playlists));
+  },
+  setMode({ commit }, mode) {
+    commit(types.SET_MODE, mode);
   },
   load({ commit, dispatch }) {
     const musics = localStorage.getItem("musics");
@@ -104,6 +129,9 @@ export const actions = {
       },
       onPrevious() {
         dispatch("previous");
+      },
+      onEnd() {
+        dispatch("end");
       }
     });
   }

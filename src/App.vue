@@ -11,6 +11,23 @@
             </v-toolbar-title>
             <v-spacer></v-spacer>
             <portal-target name="toolbar" />
+            <v-menu left>
+              <v-btn icon slot="activator">
+                <v-icon color="primary">{{ modes[mode] }}</v-icon>
+              </v-btn>
+
+              <v-list>
+                <v-list-tile
+                  v-for="(icon, amode) in modes"
+                  :key="amode"
+                >
+                    <v-btn icon @click="setMode(amode)">
+                      <v-icon :color="mode === amode ? 'primary' : 'black'">{{ icon }}</v-icon>
+                    </v-btn>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+
         </v-toolbar>
         <v-content>
             <router-view/>
@@ -25,14 +42,24 @@
 import PlayerBar from "./components/layout/PlayerBar.vue";
 import MobileNavbar from "./components/layout/MobileNavbar.vue";
 import Navbar from "./components/layout/Navbar.vue";
+import { mapState, mapActions } from "vuex";
+
+const modes = {
+  linear: "arrow_right_alt",
+  random: "shuffle",
+  loop: "repeat"
+};
 
 export default {
   name: "App",
   data() {
     return {
-      mini: false
+      mini: false,
+      modes
     };
   },
+  computed: mapState("musics", ["mode"]),
+  methods: mapActions("musics", ["setMode"]),
   components: {
     PlayerBar,
     MobileNavbar,
