@@ -69,7 +69,7 @@ export const actions = {
 
     const musics = getters.getMusicsByPlaylist(playlist);
     index++;
-    index %= musics.length;
+    if (index >= musics.length) index = 0;
 
     dispatch("player/setMusic", musics[index], {
       root: true
@@ -81,7 +81,7 @@ export const actions = {
 
     const musics = getters.getMusicsByPlaylist(playlist);
     index--;
-    index %= musics.length;
+    if (index < 0) index = musics.length - 1;
 
     dispatch("player/setMusic", musics[index], {
       root: true

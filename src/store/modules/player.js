@@ -50,7 +50,7 @@ export const mutations = {
 export const actions = {
   play({ commit }) {
     commit(types.PLAY);
-    play();
+    play().catch(() => {}); // Silence errors
   },
   pause({ commit }) {
     commit(types.PAUSE);
