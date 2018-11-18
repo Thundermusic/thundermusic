@@ -16,6 +16,7 @@ const DEFAULT_SONG = {
 const types = {
   SET_POSITION: "SET_POSITION",
   SET_DURATION: "SET_DURATION",
+  SET_VOLUME: "SET_VOLUME",
   SET_MUSIC: "SET_MUSIC",
   PLAY: "PLAY",
   PAUSE: "PAUSE"
@@ -35,6 +36,9 @@ export const mutations = {
   },
   [types.SET_DURATION](state, duration) {
     state.duration = duration;
+  },
+  [types.SET_VOLUME](state, volume) {
+    state.volume = volume;
   },
   [types.SET_MUSIC](state, music) {
     state.current = music;
