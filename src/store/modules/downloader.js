@@ -41,19 +41,6 @@ export const actions = {
 
     // Indeterminate
     commit(types.SET_PROGRESS, { id: music.id, progress: NaN });
-
-    url.then(url => {
-      localStorage.setItem(
-        "musics",
-        JSON.stringify([
-          ...JSON.parse(localStorage.getItem("musics") || "[]"),
-          {
-            ...music,
-            url
-          }
-        ])
-      );
-    });
   },
   load() {}
 };

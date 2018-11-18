@@ -10,7 +10,8 @@ import {
 const DEFAULT_SONG = {
   id: "default",
   title: "Aucune musique",
-  artist: "Personne"
+  artist: "Personne",
+  url: ""
 };
 
 const types = {
@@ -71,9 +72,15 @@ export const actions = {
     commit(types.SET_VOLUME, volume);
   },
   async setMusic({ commit, dispatch }, music) {
-    commit(types.SET_MUSIC, music);
-    await setMusic(music);
-    dispatch("play");
+    if (music) {
+      commit(types.SET_MUSIC, music);
+      await setMusic(music);
+      dispatch("play");
+    } else {
+      dispatch("pause");
+      commit(types.SET_MUSIC, DEFAULT_SONG);
+      await setMusic(DEFAULT_SONG);
+    }
   },
   load({ dispatch, commit, state }) {
     addHandlers({

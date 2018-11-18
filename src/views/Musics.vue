@@ -8,8 +8,9 @@
         >
             <template slot-scope="{ music }">
                 <v-list-tile-action>
-                    <v-icon color="grey lighten-1">add</v-icon>
-                    <v-icon color="grey lighten-1">edit</v-icon>
+                    <v-btn v-if="!(music.id in progress)" icon @click.stop="deleteMusic(music)">
+                        <v-icon color="grey lighten-1">delete</v-icon>
+                    </v-btn>
                 </v-list-tile-action>
             </template>
         </music-list>
@@ -31,7 +32,7 @@ export default {
     ...mapState("player", ["current"]),
     ...mapState("downloader", ["progress"])
   },
-  methods: mapActions("musics", ["play"])
+  methods: mapActions("musics", ["play", "deleteMusic"])
 };
 </script>
 

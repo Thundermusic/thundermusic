@@ -94,3 +94,16 @@ export async function fetchToFile(
 
   return data;
 }
+
+export async function cleanupMusic(music) {
+  if (
+    "serviceWorker" in navigator &&
+    (await navigator.serviceWorker.getRegistration())
+  ) {
+    await waitForController();
+    await sendMessage({
+      type: "delete",
+      url: await music.url
+    });
+  }
+}

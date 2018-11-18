@@ -39,6 +39,19 @@ self.addEventListener("message", event => {
         })()
       );
       break;
+    case "delete":
+      event.waitUntil(
+        (async () => {
+          const { url } = event.data;
+          const cache = await caches.open("musics");
+          await cache.delete(url, {
+            ignoreMethod: true,
+            ignoreSearch: true,
+            ignoreVary: true
+          });
+          event.ports[0].postMessage(true);
+        })()
+      );
   }
 });
 

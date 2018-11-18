@@ -20,6 +20,7 @@
                         :value="progress[music.id]"
                         :indeterminate="!progress[music.id]"
                     ></v-progress-linear>
+                    <slot :music="music"></slot>
                 </v-list-tile>
                 <v-divider v-if="index + 1 < musics.length"></v-divider>
             </template>

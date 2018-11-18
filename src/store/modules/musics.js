@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { addHandlers } from "../../platform/web";
+import { addHandlers, cleanupMusic } from "../../platform/web";
 
 export const state = {
   musics: [],
@@ -11,6 +11,7 @@ export const state = {
 
 const types = {
   ADD_MUSIC: "ADD_MUSIC",
+  DELETE_MUSIC: "DELETE_MUSIC",
   SET_MUSICS: "SET_MUSICS",
   SET_PLAYLIST: "SET_PLAYLIST",
   SET_PLAYLIST_INDEX: "SET_PLAYLIST_INDEX",
@@ -22,6 +23,10 @@ const types = {
 export const mutations = {
   [types.ADD_MUSIC](state, music) {
     state.musics.push(music);
+  },
+  [types.DELETE_MUSIC](state, id) {
+    const index = state.musics.findIndex(music => music.id === id);
+    if (index != -1) state.musics.splice(index, 1);
   },
   [types.SET_MUSICS](state, musics) {
     state.musics = musics;
@@ -60,6 +65,31 @@ export const getters = {
 export const actions = {
   add({ commit }, music) {
     commit(types.ADD_MUSIC, music);
+
+    music.url.then(url => {
+      localStorage.setItem(
+        "musics",
+        JSON.stringify([
+          ...JSON.parse(localStorage.getItem("musics") || "[]"),
+          {
+            ...music,
+            url
+          }
+        ])
+      );
+    });
+  },
+  async deleteMusic({ commit, state, getters, dispatch }, music) {
+    const currentMusic = getters.getMusicsByPlaylist(state.currentPlaylist)[
+      state.currentPlaylistIndex
+    ];
+
+    if (currentMusic.id === music.id)
+      dispatch("player/setMusic", null, { root: true });
+
+    await cleanupMusic(music);
+    commit(types.DELETE_MUSIC, music.id);
+    localStorage.setItem("musics", JSON.stringify(state.musics));
   },
   play({ dispatch, getters, commit }, { music, playlist }) {
     dispatch("player/setMusic", music, { root: true });
