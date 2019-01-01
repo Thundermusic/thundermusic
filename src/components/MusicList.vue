@@ -41,7 +41,7 @@ export default {
 
 <style lang="scss">
 .music-list {
-  padding-top: 6px;
+  padding-top: 4px !important;
 
   .music-title {
     font-weight: 500;

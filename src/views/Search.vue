@@ -136,12 +136,18 @@ export default {
     }
   }
 }
+
 .provider-logo {
   height: 34px;
   width: 34px;
   margin-top: -(10px / 4);
 }
+
 .search-providers .v-list__tile__action {
   min-width: inherit;
+}
+
+.v-input__append-inner {
+  margin-top: 14px !important;
 }
 </style>
