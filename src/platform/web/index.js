@@ -59,7 +59,6 @@ export function pause() {
 }
 
 export function seek(position) {
-  console.log("Seek to " + position);
   audio.currentTime = position;
 }
 
