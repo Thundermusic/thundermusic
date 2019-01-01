@@ -2,16 +2,16 @@
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 pt-2 music flex-0">
-				<div class="disk" :class="{ paused }" :style="{ 'background-image': current.thumbnail && `url(${current.thumbnail})` }">
+				<!-- <div class="disk" :class="{ paused }" :style="{ 'background-image': current.thumbnail && `url(${current.thumbnail})` }">
 					<span class="inner"/>
-				</div>
+				</div> TODO: Fix it before putting it again -->
 				<div class="infos">
 					<span class="title">{{ current.title }}</span>
 					<span class="artist">{{ current.artist || current.channel }}</span>
 				</div>
 			</v-flex>
 			<v-flex class="slider-row">
-				<v-layout row fill-height class="mx-4">
+				<v-layout row class="slider-layout mx-4">
 					<v-flex class="flex-0 display-flex">
 						<span>{{ position | duration }}</span>
 					</v-flex>
@@ -125,11 +125,16 @@ $xs-bar-height: 56px;
   .display-flex {
     display: flex;
     align-items: center;
+    justify-content: space-evenly;
   }
 
   .infos,
   .disk {
     display: inline-block;
+  }
+
+  .slider-layout {
+    height: 100%;
   }
 
   $disk-size: 32px;
@@ -204,6 +209,14 @@ $xs-bar-height: 56px;
       .song-progress {
         opacity: 0;
       }
+    }
+
+    .controls .v-btn {
+      margin: 0;
+    }
+
+    .slider-layout {
+      height: 70%;
     }
   }
 }

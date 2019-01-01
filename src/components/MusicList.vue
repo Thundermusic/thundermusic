@@ -2,7 +2,7 @@
     <v-list class="music-list pa-0" two-line>
         <recycle-scroller :items="musics" :item-height="73">
             <template slot-scope="{ item: music, index }">
-                <v-list-tile avatar ripple :value="selected.includes(music.id)" @click="$emit('select', music)">
+                <v-list-tile avatar ripple :value="selected.includes(music.id)" @click="$emit('select', music)" :class="{ 'first': index === 0 }">
                     <v-list-tile-avatar :tile="true" size="auto">
                         <img class="thumbnail" :src="music.thumbnail || require('../assets/thumbnail_default.png')" />
                     </v-list-tile-avatar>
@@ -41,7 +41,7 @@ export default {
 
 <style lang="scss">
 .music-list {
-  padding-top: 4px;
+  padding-top: 6px;
 
   .music-title {
     font-weight: 500;
