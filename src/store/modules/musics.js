@@ -12,6 +12,7 @@ export const state = {
 const types = {
   ADD_MUSIC: "ADD_MUSIC",
   DELETE_MUSIC: "DELETE_MUSIC",
+  EDIT_MUSIC: "EDIT_MUSIC",
   SET_MUSICS: "SET_MUSICS",
   SET_PLAYLIST: "SET_PLAYLIST",
   SET_PLAYLIST_INDEX: "SET_PLAYLIST_INDEX",
@@ -27,6 +28,10 @@ export const mutations = {
   [types.DELETE_MUSIC](state, id) {
     const index = state.musics.findIndex(music => music.id === id);
     if (index != -1) state.musics.splice(index, 1);
+  },
+  [types.EDIT_MUSIC](state, music) {
+    const index = state.musics.findIndex(m => music.id === m.id);
+    state.musics[index] = music;
   },
   [types.SET_MUSICS](state, musics) {
     state.musics = musics;
@@ -89,6 +94,10 @@ export const actions = {
 
     await cleanupMusic(music);
     commit(types.DELETE_MUSIC, music.id);
+    localStorage.setItem("musics", JSON.stringify(state.musics));
+  },
+  edit({ commit, state }, music) {
+    commit(types.EDIT_MUSIC, music);
     localStorage.setItem("musics", JSON.stringify(state.musics));
   },
   play({ dispatch, getters, commit }, { music, playlist }) {
