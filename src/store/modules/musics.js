@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { addHandlers, cleanupMusic, storage } from "../../platform/web";
+import { addHandlers, cleanupMusic, storage } from "platform";
 
 export const state = {
   musics: [],

@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { providers } from "../../platform/web";
+import { providers } from "platform";
 
 export const state = {
   progress: {}

@@ -1,4 +1,5 @@
-const { BASE_URL = "/" } = process.env;
+const { resolve } = require("path");
+const { BASE_URL = "/", PLATFORM } = process.env;
 
 module.exports = {
   baseUrl: BASE_URL,
@@ -18,5 +19,8 @@ module.exports = {
   },
   pluginOptions: {
     cordovaPath: "cordova"
+  },
+  chainWebpack: config => {
+    config.resolve.alias.set("platform", resolve(__dirname, PLATFORM));
   }
 };

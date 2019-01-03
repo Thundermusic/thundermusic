@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { storage } from "../../platform/web";
+import { storage } from "platform";
 
 /* Default values */
 export const state = {

@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "cross-env PLATFORM='src/platform/web' vue-cli-service serve",
+    "build": "cross-env PLATFORM='src/platform/web' vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "cordova-serve-android": "cross-env BASE_URL='' vue-cli-service cordova-serve-android",
-    "cordova-build-android": "cross-env BASE_URL='' vue-cli-service cordova-build-android",
-    "cordova-serve-ios": "cross-env BASE_URL='' vue-cli-service cordova-serve-ios",
-    "cordova-build-ios": "cross-env BASE_URL='' vue-cli-service cordova-build-ios",
-    "cordova-serve-browser": "cross-env BASE_URL='' vue-cli-service cordova-serve-browser",
-    "cordova-build-browser": "cross-env BASE_URL='' vue-cli-service cordova-build-browser"
+    "cordova-serve-android": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-serve-android",
+    "cordova-build-android": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-build-android",
+    "cordova-serve-ios": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-serve-ios",
+    "cordova-build-ios": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-build-ios",
+    "cordova-serve-browser": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-serve-browser",
+    "cordova-build-browser": "cross-env BASE_URL='' PLATFORM='src/platform/cordova' vue-cli-service cordova-build-browser"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0-rc.1",

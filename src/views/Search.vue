@@ -68,7 +68,7 @@ import EditDialog from "../components/EditDialog";
 import MusicList from "../components/MusicList";
 import Loading from "../components/Loading";
 
-import { providers } from "../platform/web";
+import { providers } from "platform";
 
 export default {
   props: ["query"],

@@ -1,11 +1,4 @@
-import {
-  addHandlers,
-  seek,
-  setVolume,
-  play,
-  pause,
-  setMusic
-} from "../../platform/web";
+import { addHandlers, seek, setVolume, play, pause, setMusic } from "platform";
 
 const DEFAULT_SONG = {
   id: "default",
