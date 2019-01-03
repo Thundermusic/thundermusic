@@ -2,7 +2,7 @@ function capitalize(str) {
   let result = "";
 
   for (const c of str.split(" ")) {
-    if (c.charAt(0) === "(") {
+    if (c.charAt(0) === "(" && c !== "(ft." && c !== "(feat.") {
       result += "(" + c.charAt(1).toUpperCase() + c.substring(2) + " ";
     } else {
       result += c.charAt(0).toUpperCase() + c.substring(1) + " ";
@@ -22,6 +22,27 @@ function extract(videoTitle, channel) {
 
   let video = videoTitle.trim();
 
+  let feats = [];
+  let remix = null;
+
+  if (video.indexOf("ft.") !== -1 || video.indexOf("feat.") !== 1) {
+    let pos = video.indexOf("ft");
+
+    if (pos === -1) {
+      pos = video.indexOf("feat.");
+    }
+
+    let sep = video.indexOf("-");
+    if (pos > 0 && video.charAt(pos - 1) !== "(" && sep !== -1) {
+      video =
+        video.substring(0, pos) +
+        "(" +
+        video.substring(pos, sep - 1) +
+        ")" +
+        video.substring(sep - 1, video.length);
+    }
+  }
+
   while (video.indexOf("[") !== -1 && video.indexOf("]") !== -1) {
     let a = video.indexOf("["),
       b = video.indexOf("]");
@@ -32,11 +53,10 @@ function extract(videoTitle, channel) {
     )
       continue;
 
-    video = (video.substr(0, a) + video.substr(b + 1, video.length)).trim();
+    video = (
+      video.substring(0, a) + video.substring(b + 1, video.length)
+    ).trim();
   }
-
-  let feats = [];
-  let remix = null;
 
   while (video.indexOf("(") !== -1 && video.indexOf(")") !== -1) {
     let a = video.indexOf("("),
@@ -46,16 +66,16 @@ function extract(videoTitle, channel) {
       (video.length > a + 2 && video.substr(a + 1, 2) === "ft") ||
       (video.length > a + 4 && video.substr(a + 1, 4) === "feat")
     ) {
-      feats.push(video.substr(a, b - a + 1));
+      feats.push(video.substring(a, b + 1));
     }
 
     if (b > 3 && video.toLowerCase().substr(b - 5, 5) === "remix") {
-      remix = video.substr(a, b - a + 1);
+      remix = video.substring(a, b + 1);
     }
 
     video = (
       video.substr(0, video.charAt(a - 1) === " " ? a - 1 : a) +
-      video.substr(b + 1, video.length - b + 1)
+      video.substring(b + 1, video.length)
     ).trim();
   }
 

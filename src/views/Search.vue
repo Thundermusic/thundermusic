@@ -120,16 +120,18 @@ export default {
         return;
       }
 
-      music = this.$extract(music);
-
       if (!this.hasMusic(music)) {
         this.$store.dispatch("downloader/download", {
-          music,
+          music: this.$extract(music),
           provider: this.currentProvider
         });
       }
     },
     editAndDownload(music) {
+      if (music in this.progress || this.hasMusic(music)) {
+        return;
+      }
+
       this.selected = this.$extract(music);
       this.editDialog = true;
     }
