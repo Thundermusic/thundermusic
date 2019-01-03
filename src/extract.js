@@ -33,6 +33,11 @@ function extract(videoTitle, channel) {
     }
 
     let sep = video.indexOf("-");
+
+    if (sep < pos) {
+      sep = video.length + 1;
+    }
+
     if (pos > 0 && video.charAt(pos - 1) !== "(" && sep !== -1) {
       video =
         video.substring(0, pos) +
@@ -61,6 +66,10 @@ function extract(videoTitle, channel) {
   while (video.indexOf("(") !== -1 && video.indexOf(")") !== -1) {
     let a = video.indexOf("("),
       b = video.indexOf(")");
+
+    if (a > b) {
+      break; // happens, it's fail
+    }
 
     if (
       (video.length > a + 2 && video.substr(a + 1, 2) === "ft") ||
@@ -144,11 +153,13 @@ function extract(videoTitle, channel) {
   return { title: title.trim(), artist: artist.trim() };
 }
 
-export default function(music) {
+/*export default function(music) {
   const extracted = extract(music.title, music.channel);
 
   music.title = extracted.title;
   music.channel = extracted.artist;
 
   return music;
-}
+}*/
+
+console.log(extract("Madeon - La Lune (Audio) ft. Dan Smith", "MadeonVEVO"));
