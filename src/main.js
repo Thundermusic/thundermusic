@@ -18,7 +18,11 @@ import "material-design-icons-iconfont/dist/material-design-icons.css";
 import router from "./router";
 import store from "./store";
 
+import extract from "./extract";
+
+Vue.prototype.$extract = extract;
 Vue.config.productionTip = false;
+
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import "./registerServiceWorker";
 

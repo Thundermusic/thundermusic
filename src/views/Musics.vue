@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     edit(music) {
-      this.selected = music;
+      this.selected = this.$extract(music);
       this.editDialog = true;
     },
     remove(music) {

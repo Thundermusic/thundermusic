@@ -113,6 +113,8 @@ export default {
       // TODO
     },
     download(music) {
+      music = this.$extract(music);
+
       if (!this.hasMusic(music)) {
         this.$store.dispatch("downloader/download", {
           music,
