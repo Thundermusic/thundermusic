@@ -183,6 +183,7 @@ $xs-bar-height: 56px;
       left: ($disk-size - $inner-size)/2;
       width: $inner-size;
       height: $inner-size;
+      background: white;
     }
   }
 
@@ -236,6 +237,9 @@ $xs-bar-height: 56px;
 .theme--dark .player-bar {
   .artist {
     color: #aaa;
+  }
+  .disk .inner {
+    background: #424242;
   }
 }
 </style>
