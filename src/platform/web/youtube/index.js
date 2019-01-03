@@ -93,11 +93,25 @@ async function getFormat(id) {
   return toDownload;
 }
 
-function download(song) {
-  return getFormat(song.id).then(({ url, clen }) => ({
-    url,
-    size: +(clen || new URL(url).searchParams.get("clen"))
-  }));
+const MAX_RETRIES = 3;
+
+function download(song, nRetry = 0) {
+  return getFormat(song.id).then(
+    ({ url, clen }) => ({
+      url,
+      size: +(clen || new URL(url).searchParams.get("clen"))
+    }),
+    err => {
+      if (nRetry < MAX_RETRIES) {
+        console.warn(
+          `Failed to get youtube metadata, retring ${nRetry +
+            1}/${MAX_RETRIES}`,
+          err
+        );
+        return download(song, nRetry + 1);
+      } else throw err;
+    }
+  );
 }
 
 export default {

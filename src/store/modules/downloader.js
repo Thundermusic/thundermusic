@@ -39,6 +39,14 @@ export const actions = {
       { root: true }
     );
 
+    url.catch(err => {
+      console.error(err);
+      // TODO: Better way to show message
+      alert(`Music ${music.title} download failed`);
+      commit(types.REMOVE_PROGRESS, music.id);
+      dispatch("musics/deleteMusic", music, { root: true });
+    });
+
     // Indeterminate
     commit(types.SET_PROGRESS, { id: music.id, progress: NaN });
   },
