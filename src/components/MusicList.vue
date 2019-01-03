@@ -3,7 +3,7 @@
         <recycle-scroller :items="musics" :item-height="73">
             <template slot-scope="{ item: music, index }">
                 <!-- <v-list-tile avatar ripple :value="selected.includes(music.id)" @click="$emit('select', music)" :class="{ 'first': index === 0 }">  -->
-                <v-list-tile avatar ripple @click="$emit('select', music)" :class="{ 'first': index === 0, 'downloading': isDownloading(music), 'downloaded': hasMusic && hasMusic(music) }">
+                <v-list-tile avatar ripple @click="$emit('select', music)" :class="{ 'current': current.id === music.id, 'first': index === 0, 'downloading': isDownloading(music), 'downloaded': hasMusic && hasMusic(music) }">
                     <v-list-tile-avatar :tile="true" size="auto">
                         <img class="thumbnail" :src="music.thumbnail || require('../assets/thumbnail_default.png')" />
                     </v-list-tile-avatar>
@@ -33,10 +33,19 @@
 import Loading from "./Loading";
 import RecycleScroller from "./RecycleScroller";
 
+import { mapState } from "vuex";
+
 export default {
   name: "music-list",
   components: { Loading, RecycleScroller },
   props: [/*"selected", */ "musics", "progress", "hasMusic"],
+  computed: mapState("player", [
+    "current",
+    "paused",
+    "volume",
+    "position",
+    "duration"
+  ]),
   methods: {
     isDownloading(music) {
       return music.id in this.progress;
@@ -77,6 +86,14 @@ export default {
 
   .downloaded {
     font-style: italic;
+  }
+
+  .current .v-list__tile {
+    margin-left: -3px;
+  }
+
+  .current {
+    border-left: solid 3px #f67504;
   }
 }
 </style>
