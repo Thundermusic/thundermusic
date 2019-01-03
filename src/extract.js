@@ -153,13 +153,11 @@ function extract(videoTitle, channel) {
   return { title: title.trim(), artist: artist.trim() };
 }
 
-/*export default function(music) {
+export default function(music) {
   const extracted = extract(music.title, music.channel);
 
   music.title = extracted.title;
   music.channel = extracted.artist;
 
   return music;
-}*/
-
-console.log(extract("Madeon - La Lune (Audio) ft. Dan Smith", "MadeonVEVO"));
+}
