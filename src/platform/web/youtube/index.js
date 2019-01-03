@@ -1,4 +1,4 @@
-import { decorateDownload } from "../sw-client";
+import { swDownload } from "../sw-client";
 import { search } from "./api";
 import { parse } from "querystring";
 import FORMATS from "./formats";
@@ -95,7 +95,7 @@ async function getFormat(id) {
 
 const MAX_RETRIES = 3;
 
-function download(song, nRetry = 0) {
+function getMeta(song, nRetry = 0) {
   return getFormat(song.id).then(
     ({ url, clen }) => ({
       url,
@@ -108,7 +108,7 @@ function download(song, nRetry = 0) {
             1}/${MAX_RETRIES}`,
           err
         );
-        return download(song, nRetry + 1);
+        return getMeta(song, nRetry + 1);
       } else throw err;
     }
   );
@@ -118,5 +118,6 @@ export default {
   name: "Youtube",
   icon: require("../../../assets/youtube_icon.svg"),
   search,
-  download: decorateDownload(download)
+  getMeta,
+  download: swDownload(getMeta)
 };

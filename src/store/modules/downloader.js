@@ -20,8 +20,8 @@ export const mutations = {
 };
 
 export const actions = {
-  download({ commit, dispatch }, { music, provider }) {
-    const url = providers[provider].download(music, progress => {
+  download({ commit, dispatch }, { music, meta, provider }) {
+    const url = providers[provider].download(music, meta, progress => {
       progress *= 100;
       if (progress === 100) {
         commit(types.REMOVE_PROGRESS, music.id);

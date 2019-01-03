@@ -81,6 +81,7 @@ export default {
       query: "",
       results: [],
       selected: {},
+      metas: {},
       editDialog: false /*,
       selected: []*/
     };
@@ -112,8 +113,14 @@ export default {
         }
       );
     },
-    play(/* music */) {
-      // TODO
+    play(music) {
+      const meta = this.providers[this.currentProvider].getMeta(music);
+      this.metas[music.id] = meta;
+
+      this.$store.dispatch("player/setMusic", {
+        ...music,
+        url: meta.then(({ url }) => url)
+      });
     },
     download(music) {
       if (music in this.progress || this.hasMusic(music)) {
@@ -123,7 +130,8 @@ export default {
       if (!this.hasMusic(music)) {
         this.$store.dispatch("downloader/download", {
           music: this.$extract(music),
-          provider: this.currentProvider
+          provider: this.currentProvider,
+          meta: this.metas[music.id]
         });
       }
     },

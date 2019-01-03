@@ -1,4 +1,4 @@
-import { decorateDownload } from "./sw-client";
+import { swDownload } from "./sw-client";
 
 const CLIENT_ID = "yKErPEAPC9QCeJnXv3FNzzRKaEqRZua6";
 const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
@@ -44,7 +44,7 @@ async function search(query) {
   );
 }
 
-async function download(music) {
+async function getMeta(music) {
   const { transcodings } = music.soundcloud;
 
   const transcoding = transcodings.find(
@@ -60,5 +60,6 @@ export default {
   name: "Soundcloud",
   icon: require("../../assets/soundcloud_icon.svg"),
   search,
-  download: decorateDownload(download)
+  getMeta,
+  download: swDownload(getMeta)
 };

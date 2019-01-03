@@ -29,8 +29,8 @@ function waitForController() {
   });
 }
 
-export function decorateDownload(downloadFn) {
-  return async (music, progressFn) => {
+export function swDownload(getMeta) {
+  return async (music, meta, progressFn) => {
     if (
       "serviceWorker" in navigator &&
       (await navigator.serviceWorker.getRegistration())
@@ -47,11 +47,11 @@ export function decorateDownload(downloadFn) {
       if (hasDownloaded) {
         return url;
       } else {
-        return fetchToFile(await downloadFn(music), music, progressFn);
+        return fetchToFile(await (meta || getMeta(music)), music, progressFn);
       }
     } else {
       console.warn("Service Worker not enabled");
-      const { url } = await downloadFn(music);
+      const { url } = await (meta || getMeta(music));
       progressFn(1);
       return url;
     }
