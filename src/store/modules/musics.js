@@ -68,14 +68,12 @@ export const getters = {
 };
 
 export const actions = {
-  add({ commit }, music) {
+  async add({ commit }, music) {
     commit(types.ADD_MUSIC, music);
 
-    music.url.then(url => {
-      storage.addMusic({
-        ...music,
-        url
-      });
+    await storage.addMusic({
+      ...music,
+      url: await music.url
     });
   },
   async deleteMusic({ commit, state, getters, dispatch }, music) {
@@ -90,9 +88,12 @@ export const actions = {
     commit(types.DELETE_MUSIC, music.id);
     return storage.deleteMusic(music.id);
   },
-  edit({ commit }, music) {
+  async edit({ commit }, music) {
     commit(types.EDIT_MUSIC, music);
-    return storage.updateMusic(music);
+    await storage.updateMusic({
+      ...music,
+      url: await music.url
+    });
   },
   play({ dispatch, getters, commit }, { music, playlist }) {
     dispatch("player/setMusic", music, { root: true });
