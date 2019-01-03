@@ -34,7 +34,7 @@
         </v-form>
 
         <!-- <music-list :musics="results" :selected="selected" @select="select" /> -->
-        <music-list :musics="results" @select="play">
+        <music-list :musics="results" @select="play" :progress="progress" :hasMusic="hasMusic">
             <template slot-scope="{ music }">
                 <v-list-tile-action>
                     <v-btn icon @click.stop="download(music)">
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import EditDialog from "../components/EditDialog";
 import MusicList from "../components/MusicList";
 import Loading from "../components/Loading";
@@ -85,7 +85,10 @@ export default {
       selected: []*/
     };
   },
-  computed: mapGetters("musics", ["hasMusic"]),
+  computed: {
+    ...mapGetters("musics", ["hasMusic"]),
+    ...mapState("downloader", ["progress"])
+  },
   watch: {
     currentProvider() {
       this.results = [];
@@ -113,6 +116,10 @@ export default {
       // TODO
     },
     download(music) {
+      if (music in this.progress || this.hasMusic(music)) {
+        return;
+      }
+
       music = this.$extract(music);
 
       if (!this.hasMusic(music)) {
@@ -123,7 +130,7 @@ export default {
       }
     },
     editAndDownload(music) {
-      this.selected = music;
+      this.selected = this.$extract(music);
       this.editDialog = true;
     }
     /*select(music) {

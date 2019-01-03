@@ -3,17 +3,17 @@
         <recycle-scroller :items="musics" :item-height="73">
             <template slot-scope="{ item: music, index }">
                 <!-- <v-list-tile avatar ripple :value="selected.includes(music.id)" @click="$emit('select', music)" :class="{ 'first': index === 0 }">  -->
-                <v-list-tile avatar ripple @click="$emit('select', music)" :class="{ 'first': index === 0 }">
+                <v-list-tile avatar ripple @click="$emit('select', music)" :class="{ 'first': index === 0, 'downloading': isDownloading(music), 'downloaded': hasMusic && hasMusic(music) }">
                     <v-list-tile-avatar :tile="true" size="auto">
                         <img class="thumbnail" :src="music.thumbnail || require('../assets/thumbnail_default.png')" />
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                         <v-list-tile-title class="music-title">{{ music.title }}</v-list-tile-title>
                         <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
-                        <v-list-tile-sub-title>{{ music.duration || '?' }}</v-list-tile-sub-title>
+                        <v-list-tile-sub-title>{{ isDownloading(music) ? 'Téléchargement...' : (hasMusic && hasMusic(music) ? 'Déjà ajoutée' : music.duration || '?') }}</v-list-tile-sub-title>
                     </v-list-tile-content>
                     <v-progress-linear
-                        v-if="progress && music.id in progress"
+                        v-if="isDownloading(music)"
                         class="ma-0 progress"
                         color="primary"
                         background-color="transparent"
@@ -36,7 +36,12 @@ import RecycleScroller from "./RecycleScroller";
 export default {
   name: "music-list",
   components: { Loading, RecycleScroller },
-  props: [/*"selected", */ "musics", "progress"]
+  props: [/*"selected", */ "musics", "progress", "hasMusic"],
+  methods: {
+    isDownloading(music) {
+      return music.id in this.progress;
+    }
+  }
 };
 </script>
 
@@ -63,6 +68,15 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  .downloading,
+  .downloaded {
+    color: #444;
+  }
+
+  .downloaded {
+    font-style: italic;
   }
 }
 </style>
