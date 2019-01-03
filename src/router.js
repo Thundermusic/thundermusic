@@ -14,6 +14,7 @@ export const routes = [
     path: "/search",
     component: Search,
     name: "search",
+    props: route => ({ query: route.query.q }),
     meta: {
       name_fr: "Rechercher",
       icon: "search",

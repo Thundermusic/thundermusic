@@ -3,7 +3,8 @@ import { storage } from "../../platform/web";
 
 /* Default values */
 export const state = {
-  showDisk: false
+  showDisk: false,
+  dark: false
 };
 
 const types = {

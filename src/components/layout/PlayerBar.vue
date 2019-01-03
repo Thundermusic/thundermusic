@@ -3,7 +3,7 @@
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 pt-2 music flex-0">
 				<div class="disk" :class="{ paused }" v-if="showDisk">
-          <img :src="current.thumbnail">
+          <img v-if="current.thumbnail" :src="current.thumbnail">
 					<span class="inner"/>
 				</div>
 				<div class="infos">
@@ -183,7 +183,7 @@ $xs-bar-height: 56px;
       left: ($disk-size - $inner-size)/2;
       width: $inner-size;
       height: $inner-size;
-      background-color: white;
+      background: white;
     }
   }
 
@@ -231,6 +231,15 @@ $xs-bar-height: 56px;
     .slider-layout {
       height: 70%;
     }
+  }
+}
+
+.theme--dark .player-bar {
+  .artist {
+    color: #aaa;
+  }
+  .disk .inner {
+    background: #424242;
   }
 }
 </style>
