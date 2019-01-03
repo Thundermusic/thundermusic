@@ -26,7 +26,7 @@ function extract(videoTitle, channel) {
   let remix = null;
 
   if (video.indexOf("ft.") !== -1 || video.indexOf("feat.") !== 1) {
-    let pos = video.indexOf("ft");
+    let pos = video.indexOf("ft.");
 
     if (pos === -1) {
       pos = video.indexOf("feat.");
@@ -90,7 +90,7 @@ function extract(videoTitle, channel) {
 
   video = video
     .replace(/\s+/g, " ")
-    .replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`)
+    //.replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`)
     .replace(/ \(?extended\)?/gi, "")
     .trim();
 
@@ -101,9 +101,6 @@ function extract(videoTitle, channel) {
   if (video.endsWith("-")) {
     video = video.substr(video.length - 1).trim();
   }
-
-  // 'The Chainsmokers - Side Effects (Lyric Video) ft. Emily Warren '
-  // --> 'The Chainsmokers - Side Effects (ft. Emily Warren)'
 
   let title = null;
   let artist = null;
