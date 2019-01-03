@@ -28,7 +28,7 @@ export const state = {
   paused: true,
   position: 0,
   duration: 0,
-  volume: 100
+  volume: localStorage.getItem("volume") || 100
 };
 
 export const mutations = {
@@ -40,6 +40,7 @@ export const mutations = {
   },
   [types.SET_VOLUME](state, volume) {
     state.volume = volume;
+    localStorage.setItem("volume", volume);
   },
   [types.SET_MUSIC](state, music) {
     state.current = music;

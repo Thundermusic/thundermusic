@@ -7,6 +7,7 @@ import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutub
 export const playlistComponents = [ImportFromYoutube];
 
 const audio = new Audio();
+audio.volume = (localStorage.getItem("volume") || 100) / 100;
 
 export async function addHandlers({
   onPositionChange,
