@@ -38,23 +38,16 @@
             </feature>
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="application">
-            <service android:name="fr.litarvan.thundermusic.core.DownloadService" />
-            <service android:name="fr.litarvan.thundermusic.core.ThundermusicService" />
-        </config-file>
-
         <source-file src="src/android/DownloadManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
-        <source-file src="src/android/DownloadService.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/EventManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
-        <source-file src="src/android/MusicControlBroadcastReceiver.java" target-dir="src/fr/litarvan/thundermusic/core" />
-        <source-file src="src/android/MusicControlNotification.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/MusicManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
-        <source-file src="src/android/MusicPlayer.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Song.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/SongToDownload.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Thundermusic.java" target-dir="src/fr/litarvan/thundermusic/core" />
-        <source-file src="src/android/ThundermusicService.java" target-dir="src/fr/litarvan/thundermusic/core" />
-      </platform>
+
+        <framework src="plugin.gradle" custom="true" type="gradleReference"/>
+        <framework src="com.android.support:support-core-utils:27.0.0" />
+    </platform>
 
      <!-- ios -->
      <platform name="ios">

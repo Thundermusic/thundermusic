@@ -30,6 +30,8 @@ public class EventManager
 
     public void error(String error)
     {
+        Log.e("Thundermusic",  error);
+
         try {
             JSONObject obj = new JSONObject();
             obj.put("type", "error");

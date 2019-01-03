@@ -29,7 +29,7 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
-    <plugin name="cordova-plugin-thundermusic" spec="thundermusic" />
     <engine name="android" spec="^7.1.1" />
     <engine name="ios" spec="^4.5.5" />
+    <plugin name="cordova-plugin-thundermusic" spec="thundermusic/" />
 </widget>

@@ -9,32 +9,28 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.os.ResultReceiver;
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DownloadManager
 {
     private MusicManager musicManager;
-    private ResultReceiver receiver;
+    private EventManager eventManager;
     private BlockingQueue<SongToDownload> queue;
     private List<SongToDownload> downloads;
 
-    public DownloadManager(MusicManager musicManager, ResultReceiver receiver)
+    public DownloadManager(MusicManager musicManager, EventManager eventManager)
     {
         this.musicManager = musicManager;
-        this.receiver = receiver;
+        this.eventManager = eventManager;
         this.queue = new LinkedBlockingQueue<>();
         this.downloads = new ArrayList<>();
     }
@@ -61,21 +57,11 @@ public class DownloadManager
 
                     File output = musicManager.getFile(song);
 
-                    song.setProgress(-1);
-                    update();
-
-                    try {
-                        download(Thundermusic.API_URL + "convert?query=" + URLEncoder.encode("https://www.youtube.com/watch?v=" + song.getId()), null, null, true);
-                    } catch (IOException e) {
-                        error("Error while converting song", e);
-                        return;
-                    }
-
                     song.setProgress(0);
                     update();
 
                     try {
-                        download(Thundermusic.API_URL + "download?id=" + song.getId(), new FileOutputStream(output), song, false);
+                        download(song.getUrl(), new FileOutputStream(output), song, false);
                     } catch (IOException e) {
                         error("Error while downloading song", e);
                         return;
@@ -132,7 +118,7 @@ public class DownloadManager
 
         int lastProgress = 0;
 
-        byte data[] = new byte[1024];
+        byte[] data = new byte[1024];
         long total = 0;
         int count;
 
@@ -164,16 +150,13 @@ public class DownloadManager
 
     protected void error(String message, Exception error)
     {
-        Bundle bundle = new Bundle();
-        bundle.putString("error", message + " : " + error.getMessage());
-
-        receiver.send(ThundermusicService.RSP_ERROR, bundle);
         Log.e("TM-DownloadManager", "Error while downloading", error);
+        eventManager.error("Error while downloading : " +  message);
     }
 
     protected void update()
     {
-        Bundle bundle = new Bundle();
+        JSONObject event = new JSONObject();
         JSONArray array = new JSONArray();
         SongToDownload[] songs = downloads.toArray(new SongToDownload[0]);
 
@@ -185,7 +168,13 @@ public class DownloadManager
             error("Error while writing JSON", e);
         }
 
-        bundle.putString("downloads", array.toString());
-        receiver.send(ThundermusicService.RSP_DOWNLOADS, bundle);
+        try {
+            event.put("type", "downloads");
+            event.put("downloads", songs);
+        } catch (JSONException e) {
+            error("Error while sending downloads event", e);
+        }
+
+        eventManager.emit(event);
     }
 }

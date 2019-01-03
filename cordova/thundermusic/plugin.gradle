@@ -1,0 +1,9 @@
+repositories {
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    compile "com.github.AdrienPoupa:jaudiotagger:2.2.3"
+}

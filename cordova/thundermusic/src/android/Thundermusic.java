@@ -1,16 +1,5 @@
 package fr.litarvan.thundermusic.core;
 
-import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
-import android.os.ResultReceiver;
 import android.util.Log;
 import fr.litarvan.thundermusic.core.EventManager.EventListener;
 import org.apache.cordova.CallbackContext;
@@ -26,30 +15,11 @@ public class Thundermusic extends CordovaPlugin
     public static final String VERSION = "1.0.0";
     public static final String API_URL = "https://api.thundermusic.litarvan.com/";
 
-    private Messenger playerMessenger;
     private EventManager eventManager;
     private CallbackContext initCallback;
 
-    private Runnable onConnected;
-
-    private ServiceConnection playerConnection = new ServiceConnection()
-    {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder)
-        {
-            playerMessenger = new Messenger(iBinder);
-
-            if (onConnected != null) {
-                onConnected.run();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName)
-        {
-            playerMessenger = null;
-        }
-    };
+    private MusicManager musicManager;
+    private DownloadManager downloadManager;
 
     public Thundermusic()
     {
@@ -64,85 +34,32 @@ public class Thundermusic extends CordovaPlugin
 
     protected void init()
     {
-        Intent intent = new Intent(webView.getContext(), ThundermusicService.class);
-        intent.putExtra("receiver", new ResultReceiver(null)
+        musicManager = new MusicManager(this.webView.getContext(), eventManager);
+        downloadManager = new DownloadManager(musicManager, eventManager);
+
+        cordova.getThreadPool().submit(new Runnable()
         {
             @Override
-            protected void onReceiveResult(int resultCode, Bundle resultData)
+            public void run()
             {
-                JSONObject result = new JSONObject();
+                try {
+                    musicManager.load();
+                } catch (Exception e) {
+                    eventManager.error("Error while reading songs : " + e.getMessage());
 
-                switch (resultCode)
-                {
-                    case ThundermusicService.RSP_INITIALIZED:
-                        initCallback.success();
-                        break;
-                    case ThundermusicService.RSP_ERROR:
-                        String error = resultData.getString("error");
-
-                        Log.e("Thundermusic", "Error from service : " + error);
-                        eventManager.error(error);
-                        break;
-                    case ThundermusicService.RSP_POSITION:
-                        try {
-                            result.put("type", "position");
-                            result.put("position", resultData.getInt("position"));
-                            result.put("duration", resultData.getInt("duration"));
-
-                            eventManager.emit(result);
-                        } catch (JSONException e) {
-                            Log.e("Thundermusic", "Error while sending position event", e);
-                            eventManager.error("Error while sending position event : " + e.getMessage());
-                        }
-
-                        break;
-                    case ThundermusicService.RSP_EVENT:
-                        try {
-                            eventManager.emit(new JSONObject(resultData.getString("event")));
-                        } catch (JSONException e) {
-                            Log.e("Thundermusic", "Error while sending event", e);
-                            eventManager.error("Error while sending event : " + e.getMessage());
-                        }
-
-                        break;
-                    case ThundermusicService.RSP_DOWNLOADS:
-                        try {
-                            JSONArray songs = new JSONArray(resultData.getString("downloads"));
-                            JSONObject event = new JSONObject();
-                            event.put("type", "downloads");
-                            event.put("downloads", songs);
-
-                            eventManager.emit(event);
-                        } catch (JSONException e) {
-                            Log.e("Thundermusic", "Error while sending downloads event", e);
-                            eventManager.error("Error while sending downloads event : " + e.getMessage());
-                        }
-
-                        break;
+                    initCallback.error(e.getMessage());
                 }
+
+                initCallback.success();
             }
         });
-        webView.getContext().bindService(intent, playerConnection, Context.BIND_AUTO_CREATE);
 
-        if (playerMessenger != null) {
-            send(ThundermusicService.MSG_INIT, null);
-        } else {
-            onConnected = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    send(ThundermusicService.MSG_INIT, null);
-                }
-            };
-        }
+        downloadManager.start();
     }
 
     @Override
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException
     {
-        Bundle bundle = new Bundle();
-
         switch (action)
         {
             case "init":
@@ -161,79 +78,30 @@ public class Thundermusic extends CordovaPlugin
                 });
                 return true;
             case "download":
-                System.out.println("On send le download");
-                bundle.putString("song", args.getJSONObject(0).toString());
-                send(ThundermusicService.MSG_DOWNLOAD, bundle);
-                break;
-            case "play":
-                bundle.putString("song", args.getJSONObject(0).toString());
-                send(ThundermusicService.MSG_PLAY, bundle);
-                break;
-            case "pause":
-                send(ThundermusicService.MSG_PAUSE, null);
-                break;
-            case "next":
-                send(ThundermusicService.MSG_NEXT, null);
-                break;
-            case "previous":
-                send(ThundermusicService.MSG_PREVIOUS, null);
-                break;
-            case "seek":
-                bundle.putInt("position", args.getInt(0));
-                send(ThundermusicService.MSG_SEEK, bundle);
-                break;
+                try {
+                    downloadManager.download(SongToDownload.fromJSON(args.getJSONObject(0)));
+                } catch (JSONException e) {
+                    eventManager.error("Error while parsing song infos : " + e.getMessage());
+                }
             case "update":
-                bundle.putString("song", args.getJSONObject(0).toString());
-                send(ThundermusicService.MSG_UPDATE, bundle);
+                try {
+                    musicManager.update(Song.fromJSON(args.getJSONObject(0)));
+                } catch (Exception e) {
+                    eventManager.error("Error while parsing song infos : " + e.getMessage());
+                }
                 break;
             case "remove":
-                bundle.putString("song", args.getJSONObject(0).toString());
-                send(ThundermusicService.MSG_REMOVE, bundle);
+                try {
+                    musicManager.remove(Song.fromJSON(args.getJSONObject(0)));
+                } catch (Exception e) {
+                    eventManager.error("Error while parsing song infos : " + e.getMessage());
+                }
                 break;
-            case "position":
-                send(ThundermusicService.MSG_POSITION, null);
-                return true;
             default:
                 return false;
         }
 
         callbackContext.success();
         return true;
-    }
-
-    protected void send(int message, Bundle data)
-    {
-        Message msg = Message.obtain(null, message, 0, 0);
-        if (data != null)
-        {
-            msg.setData(data);
-        }
-
-        try
-        {
-            playerMessenger.send(msg);
-        }
-        catch (RemoteException e)
-        {
-            Log.e("Thundermusic", "Error while sending message to service", e);
-            eventManager.error("Error while sending message to service : " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        NotificationManager notificationManager = (NotificationManager) this.webView.getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (notificationManager != null) {
-            notificationManager.cancel(MusicControlNotification.ID);
-        }
-
-        if (playerConnection != null)
-        {
-            this.webView.getContext().unbindService(playerConnection);
-        }
-
-        super.onDestroy();
     }
 }
