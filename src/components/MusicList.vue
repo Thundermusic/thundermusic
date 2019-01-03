@@ -80,11 +80,6 @@ export default {
     bottom: 0;
   }
 
-  .downloading,
-  .downloaded {
-    color: #444;
-  }
-
   .downloaded {
     font-style: italic;
   }

@@ -202,4 +202,10 @@ export default {
 .v-input__append-inner {
   margin-top: 14px !important;
 }
+
+.theme--dark #search {
+  .input {
+    background: black;
+  }
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
-    <v-app>
-        <v-toolbar app fixed color="white">
+    <v-app :dark="dark">
+        <v-toolbar app fixed>
             <v-toolbar-side-icon @click="mini = !mini" v-if="$vuetify.breakpoint.smAndUp">
                 <v-icon>menu</v-icon>
             </v-toolbar-side-icon>
@@ -58,7 +58,10 @@ export default {
       modes
     };
   },
-  computed: mapState("musics", ["mode"]),
+  computed: {
+    ...mapState("musics", ["mode"]),
+    ...mapState("settings", ["dark"])
+  },
   methods: mapActions("musics", ["setMode"]),
   components: {
     PlayerBar,
@@ -79,5 +82,9 @@ html {
 
 .v-list__tile--active {
   border-left: solid 3px #f67504;
+}
+
+.theme--light.v-toolbar {
+  background-color: white;
 }
 </style>
