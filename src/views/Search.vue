@@ -8,7 +8,8 @@
             :readonly="searching"
             box
             single-line
-            v-model="query"
+            :value="query"
+            @input="q => $router.replace({ query: { q }})"
             autofocus
             autocapitalize="off"
             autocomplete="off"
@@ -70,6 +71,7 @@ import Loading from "../components/Loading";
 import { providers } from "../platform/web";
 
 export default {
+  props: ["query"],
   name: "search",
   components: { EditDialog, Loading, MusicList },
 
@@ -78,7 +80,6 @@ export default {
       providers,
       currentProvider: Object.keys(providers)[0],
       searching: false,
-      query: "",
       results: [],
       selected: {},
       metas: {},
