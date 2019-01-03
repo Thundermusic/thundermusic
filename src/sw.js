@@ -103,17 +103,35 @@ function monitorProgress(
   );
 }
 
-workbox.routing.registerRoute(new RegExp("/musics/"), async ({ event }) => {
+workbox.routing.registerRoute(new RegExp("/musics/.+"), async ({ event }) => {
   const url = event.request.url;
   const urlEnd = url.slice(url.indexOf("/musics/"));
 
   if (DOWNLOADING.has(urlEnd)) {
+    // TODO Seek for download
     return DOWNLOADING.get(urlEnd).clone();
   }
+
   const cache = await caches.open("musics");
   const res = await cache.match(event.request);
 
-  return res;
+  if (event.request.headers.get("range")) {
+    const [, pos] = /^bytes=(\d+)-$/g.exec(event.request.headers.get("range"));
+    console.log(
+      "Range request for",
+      event.request.url,
+      ", starting position:",
+      pos
+    );
+    const ab = await res.arrayBuffer();
+    return new Response(ab.slice(+pos), {
+      status: 206,
+      statusText: "Partial Content",
+      headers: [
+        ["Content-Range", `bytes ${pos}-${ab.byteLength - 1}/${ab.byteLength}`]
+      ]
+    });
+  } else return res;
 });
 
 self.addEventListener("backgroundfetchsuccess", event => {
