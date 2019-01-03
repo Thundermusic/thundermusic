@@ -3,8 +3,7 @@ import { search } from "./api";
 import { parse } from "querystring";
 import FORMATS from "./formats";
 import { getTokens, decipherFormat } from "./sig";
-
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+import { CORS_PROXY } from "../cors";
 
 const VIDEO_EURL = "https://youtube.googleapis.com/v/";
 const INFO_URL = "https://www.youtube.com/get_video_info/";

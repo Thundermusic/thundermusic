@@ -1,7 +1,7 @@
 import { swDownload } from "./sw-client";
+import { CORS_PROXY } from "./cors";
 
 const CLIENT_ID = "yKErPEAPC9QCeJnXv3FNzzRKaEqRZua6";
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 const API_URL = CORS_PROXY + "https://api-v2.soundcloud.com";
 
 function formatDuration(duration) {

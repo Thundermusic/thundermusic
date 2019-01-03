@@ -1,4 +1,4 @@
-const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+import { CORS_PROXY } from "./cors";
 
 function sendMessage(message) {
   const channel = new MessageChannel();
