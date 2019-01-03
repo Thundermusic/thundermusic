@@ -62,6 +62,7 @@ export default {
     font-weight: 500;
   }
 
+  /* Youtube add black border to it's image, so we need to keep yt aspec ratio */
   .thumbnail {
     height: 50px !important;
     width: 90px !important;

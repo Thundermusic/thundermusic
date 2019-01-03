@@ -2,9 +2,10 @@
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 pt-2 music flex-0">
-				<!-- <div class="disk" :class="{ paused }" :style="{ 'background-image': current.thumbnail && `url(${current.thumbnail})` }">
+				<div class="disk" :class="{ paused }">
+          <img :src="current.thumbnail">
 					<span class="inner"/>
-				</div> TODO: Fix it before putting it again -->
+				</div>
 				<div class="infos">
 					<span class="title">{{ current.title }}</span>
 					<span class="artist">{{ current.artist || current.channel }}</span>
@@ -157,6 +158,16 @@ $xs-bar-height: 56px;
     position: relative;
     animation: spin 2s linear infinite;
     box-shadow: 0 0 5px black;
+    overflow: hidden;
+
+    /* Youtube add black border to it's image, so we need to keep yt aspec ratio */
+    & > img {
+      position: absolute;
+      height: $disk-size;
+      width: 9/5 * $disk-size;
+      left: -(4/5 * $disk-size)/2;
+      object-fit: cover;
+    }
 
     &.paused {
       animation-play-state: paused;
