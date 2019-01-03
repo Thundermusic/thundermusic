@@ -36,6 +36,12 @@ function extract(videoTitle, channel) {
 
     if (sep < pos) {
       sep = video.length + 1;
+
+      const last = video.lastIndexOf("(");
+
+      if (last > pos) {
+        sep = last;
+      }
     }
 
     if (pos > 0 && video.charAt(pos - 1) !== "(" && sep !== -1) {
