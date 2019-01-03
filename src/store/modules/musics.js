@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { addHandlers, cleanupMusic } from "../../platform/web";
+import { addHandlers, cleanupMusic, storage } from "../../platform/web";
 
 export const state = {
   musics: [],
@@ -72,16 +72,10 @@ export const actions = {
     commit(types.ADD_MUSIC, music);
 
     music.url.then(url => {
-      localStorage.setItem(
-        "musics",
-        JSON.stringify([
-          ...JSON.parse(localStorage.getItem("musics") || "[]"),
-          {
-            ...music,
-            url
-          }
-        ])
-      );
+      storage.addMusic({
+        ...music,
+        url
+      });
     });
   },
   async deleteMusic({ commit, state, getters, dispatch }, music) {
@@ -94,11 +88,11 @@ export const actions = {
 
     await cleanupMusic(music);
     commit(types.DELETE_MUSIC, music.id);
-    localStorage.setItem("musics", JSON.stringify(state.musics));
+    return storage.deleteMusic(music.id);
   },
-  edit({ commit, state }, music) {
+  edit({ commit }, music) {
     commit(types.EDIT_MUSIC, music);
-    localStorage.setItem("musics", JSON.stringify(state.musics));
+    return storage.updateMusic(music);
   },
   play({ dispatch, getters, commit }, { music, playlist }) {
     dispatch("player/setMusic", music, { root: true });
@@ -149,18 +143,16 @@ export const actions = {
 
     commit(types.SET_PLAYLIST_INDEX, index);
   },
-  addPlaylist({ commit, state }, playlist) {
+  addPlaylist({ commit }, playlist) {
     commit(types.ADD_PLAYLIST, playlist);
-    localStorage.setItem("playlists", JSON.stringify(state.playlists));
+    return storage.addPlaylist(playlist);
   },
   setMode({ commit }, mode) {
     commit(types.SET_MODE, mode);
   },
-  load({ commit, dispatch }) {
-    const musics = localStorage.getItem("musics");
-    if (musics) commit(types.SET_MUSICS, JSON.parse(musics));
-    const playlists = localStorage.getItem("playlists");
-    if (playlists) commit(types.SET_PLAYLISTS, JSON.parse(playlists));
+  async load({ commit, dispatch }) {
+    commit(types.SET_MUSICS, await storage.getMusics());
+    commit(types.SET_PLAYLISTS, await storage.getPlaylists());
 
     addHandlers({
       onNext() {
