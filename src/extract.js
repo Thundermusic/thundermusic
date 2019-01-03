@@ -82,6 +82,7 @@ function extract(videoTitle, channel) {
   video = video
     .replace(/\s+/g, " ")
     .replace(/[^[(]((ft|feat)\..*)/g, (_, r) => ` (${r})`)
+    .replace(/ \(?extended\)?/gi, "")
     .trim();
 
   if (video.startsWith("-")) {
@@ -113,6 +114,18 @@ function extract(videoTitle, channel) {
   if (title === null) {
     title = videoTitle;
   } else {
+    if (title.toLowerCase().indexOf("ost") !== -1) {
+      const temp = title;
+
+      title = artist;
+      artist = temp;
+    }
+
+    const ost = artist.toLowerCase().indexOf("ost");
+    if (ost !== -1) {
+      artist = artist.substring(0, ost + 3);
+    }
+
     [...feats, remix]
       .filter(s => s !== null)
       .forEach(str => (title += " " + capitalize(str.replace("(feat", "(ft"))));
