@@ -33,21 +33,37 @@
           </v-text-field>
         </v-form>
 
-        <music-list :musics="results" :selected="selected" @select="select"/>
+        <!-- <music-list :musics="results" :selected="selected" @select="select" /> -->
+        <music-list :musics="results" @select="play">
+            <template slot-scope="{ music }">
+                <v-list-tile-action>
+                    <v-btn icon @click.stop="download(music)">
+                        <v-icon color="grey lighten-1">cloud_download</v-icon>
+                    </v-btn>
 
-        <v-layout column class="controls" v-show="selected.length">
+                    <v-btn icon @click.stop="editAndDownload(music)">
+                        <v-icon color="grey lighten-1">edit</v-icon>
+                    </v-btn>
+                </v-list-tile-action>
+            </template>
+        </music-list>
+
+        <!-- <v-layout column class="controls" v-show="selected.length">
             <v-btn fab dark color="green" @click="downloadAll">
                 <v-icon>cloud_download</v-icon>
             </v-btn>
             <v-btn fab dark color="red" @click="selected = []">
                 <v-icon>select_all</v-icon>
             </v-btn>
-        </v-layout>
+        </v-layout> -->
+
+        <EditDialog v-model="editDialog" :song="selected" :download="true" @afterEdit="download(selected)" />
     </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import EditDialog from "../components/EditDialog";
 import MusicList from "../components/MusicList";
 import Loading from "../components/Loading";
 
@@ -55,7 +71,7 @@ import { providers } from "../platform/web";
 
 export default {
   name: "search",
-  components: { Loading, MusicList },
+  components: { EditDialog, Loading, MusicList },
 
   data() {
     return {
@@ -64,14 +80,16 @@ export default {
       searching: false,
       query: "",
       results: [],
-      selected: []
+      selected: {},
+      editDialog: false /*,
+      selected: []*/
     };
   },
   computed: mapGetters("musics", ["hasMusic"]),
   watch: {
     currentProvider() {
       this.results = [];
-      this.selected = [];
+      //this.selected = [];
       this.searching = false;
     }
   },
@@ -91,7 +109,22 @@ export default {
         }
       );
     },
-    select(music) {
+    play(/* music */) {
+      // TODO
+    },
+    download(music) {
+      if (!this.hasMusic(music)) {
+        this.$store.dispatch("downloader/download", {
+          music,
+          provider: this.currentProvider
+        });
+      }
+    },
+    editAndDownload(music) {
+      this.selected = music;
+      this.editDialog = true;
+    }
+    /*select(music) {
       const index = this.selected.indexOf(music.id);
       if (index >= 0) this.selected.splice(index, 1);
       else this.selected.push(music.id);
@@ -107,7 +140,7 @@ export default {
             });
         });
       this.$router.push({ name: "musics" });
-    }
+    }*/
   }
 };
 </script>
