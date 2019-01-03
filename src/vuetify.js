@@ -21,6 +21,7 @@ import {
   VDialog,
   VExpansionPanel,
   VMenu,
+  VSwitch,
   transitions
 } from "vuetify";
 
@@ -49,6 +50,7 @@ Vue.use(Vuetify, {
     VDialog,
     VExpansionPanel,
     VMenu,
+    VSwitch,
 
     transitions
   },

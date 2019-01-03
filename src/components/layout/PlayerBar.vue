@@ -2,7 +2,7 @@
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 pt-2 music flex-0">
-				<div class="disk" :class="{ paused }">
+				<div class="disk" :class="{ paused }" v-if="showDisk">
           <img :src="current.thumbnail">
 					<span class="inner"/>
 				</div>
@@ -59,13 +59,16 @@ export default {
       opened: false
     };
   },
-  computed: mapState("player", [
-    "current",
-    "paused",
-    "volume",
-    "position",
-    "duration"
-  ]),
+  computed: {
+    ...mapState("player", [
+      "current",
+      "paused",
+      "volume",
+      "position",
+      "duration"
+    ]),
+    ...mapState("settings", ["showDisk"])
+  },
   methods: {
     ...mapActions("player", ["play", "pause", "seek", "setVolume"]),
     ...mapActions("musics", ["next", "previous"])
@@ -154,7 +157,6 @@ $xs-bar-height: 56px;
     width: $disk-size;
     height: $disk-size;
     border-radius: 50%;
-    background: center/cover black;
     position: relative;
     animation: spin 2s linear infinite;
     box-shadow: 0 0 5px black;

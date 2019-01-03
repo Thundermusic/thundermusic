@@ -1,6 +1,7 @@
 import idb from "idb";
 
-const db = idb.open("thundermusic", 1, upgradeDb => {
+const db = idb.open("thundermusic", 2, upgradeDb => {
+  /* eslint-disable no-fallthrough */
   switch (upgradeDb.oldVersion) {
     case 0: {
       const musics = upgradeDb.createObjectStore("musics", { keyPath: "id" });
@@ -17,6 +18,8 @@ const db = idb.open("thundermusic", 1, upgradeDb => {
         for (const playlist of JSON.parse(oldPlaylists))
           playlists.put(playlist);
     }
+    case 1:
+      upgradeDb.createObjectStore("settings");
   }
 });
 
@@ -54,4 +57,21 @@ export async function addPlaylist(playlist) {
 export async function getPlaylists() {
   const tx = (await db).transaction("playlists");
   return tx.objectStore("playlists").getAll();
+}
+
+export async function setSetting(key, value) {
+  const tx = (await db).transaction("settings", "readwrite");
+  tx.objectStore("settings").put(value, key);
+  return tx.complete;
+}
+
+export async function getSettings() {
+  const tx = (await db).transaction("settings");
+  let cursor = await tx.objectStore("settings").openCursor();
+  const result = [];
+  while (cursor) {
+    result.push([cursor.key, cursor.value]);
+    cursor = await cursor.continue();
+  }
+  return result;
 }
