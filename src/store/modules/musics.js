@@ -153,7 +153,10 @@ export const actions = {
   },
   async load({ commit, dispatch }) {
     commit(types.SET_MUSICS, await storage.getMusics());
-    commit(types.SET_PLAYLISTS, await storage.getPlaylists());
+    commit(
+      types.SET_PLAYLISTS,
+      (await storage.getPlaylists()).reduce((o, v) => ((o[v.id] = v), o), {})
+    );
 
     addHandlers({
       onNext() {

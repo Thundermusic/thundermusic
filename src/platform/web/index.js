@@ -48,7 +48,11 @@ export async function setMusic(music) {
       title: music.title,
       artist: music.channel,
       album: undefined,
-      artwork: [{ src: music.thumbnail }]
+      artwork: [
+        {
+          src: music.thumbnail || require("../../assets/thumbnail_default.png")
+        }
+      ]
     });
   }
   audio.src = await music.url;

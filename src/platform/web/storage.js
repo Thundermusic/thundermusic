@@ -15,7 +15,7 @@ const db = idb.open("thundermusic", 2, upgradeDb => {
       if (oldMusics)
         for (const music of JSON.parse(oldMusics)) musics.put(music);
       if (oldPlaylists)
-        for (const playlist of JSON.parse(oldPlaylists))
+        for (const playlist of Object.values(JSON.parse(oldPlaylists)))
           playlists.put(playlist);
     }
     case 1:
