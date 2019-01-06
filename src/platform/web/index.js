@@ -1,8 +1,8 @@
 export { getPlaylistContent, getPlaylistInfos } from "./youtube/api";
 export { default as providers } from "./providers";
-import * as storage from "./storage";
+import * as storage from "platform/storage";
 export { storage };
-export { cleanupMusic } from "./sw-client";
+export { cleanupMusic } from "platform/sw-client";
 
 import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutube";
 

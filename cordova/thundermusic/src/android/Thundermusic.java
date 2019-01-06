@@ -1,5 +1,13 @@
 package fr.litarvan.thundermusic.core;
 
+import android.Manifest;
+import android.Manifest.permission;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import fr.litarvan.thundermusic.core.EventManager.EventListener;
 import org.apache.cordova.CallbackContext;
@@ -10,10 +18,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static android.Manifest.permission.*;
+
 public class Thundermusic extends CordovaPlugin
 {
     public static final String VERSION = "1.0.0";
-    public static final String API_URL = "https://api.thundermusic.litarvan.com/";
 
     private EventManager eventManager;
     private CallbackContext initCallback;
@@ -37,6 +46,20 @@ public class Thundermusic extends CordovaPlugin
         musicManager = new MusicManager(this.webView.getContext(), eventManager);
         downloadManager = new DownloadManager(musicManager, eventManager);
 
+        downloadManager.start();
+
+        if (!cordova.hasPermission(READ_EXTERNAL_STORAGE) || !cordova.hasPermission(WRITE_EXTERNAL_STORAGE))
+        {
+            cordova.requestPermissions(this, 0, new String[] {READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE});
+        }
+        else
+        {
+            load();
+        }
+    }
+
+    protected void load()
+    {
         cordova.getThreadPool().submit(new Runnable()
         {
             @Override
@@ -53,8 +76,6 @@ public class Thundermusic extends CordovaPlugin
                 initCallback.success();
             }
         });
-
-        downloadManager.start();
     }
 
     @Override
@@ -103,5 +124,11 @@ public class Thundermusic extends CordovaPlugin
 
         callbackContext.success();
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        load();
     }
 }

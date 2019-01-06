@@ -21,6 +21,9 @@ module.exports = {
     cordovaPath: "cordova"
   },
   chainWebpack: config => {
-    config.resolve.alias.set("platform", resolve(__dirname, PLATFORM));
+    config.resolve.alias.set(
+      "platform",
+      resolve(__dirname, `src/platform/${PLATFORM}`)
+    );
   }
 };

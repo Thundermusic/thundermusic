@@ -1,4 +1,4 @@
-import { swDownload } from "../sw-client";
+import { swDownload } from "platform/sw-client";
 import { search } from "./api";
 import { parse } from "querystring";
 import FORMATS from "./formats";

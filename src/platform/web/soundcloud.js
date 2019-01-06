@@ -1,4 +1,4 @@
-import { swDownload } from "./sw-client";
+import { swDownload } from "platform/sw-client";
 import { CORS_PROXY } from "./cors";
 
 const CLIENT_ID = "yKErPEAPC9QCeJnXv3FNzzRKaEqRZua6";

@@ -74,10 +74,12 @@ public class Song
         result.put("artist", artist);
 
         if (image != null) {
-            result.put("image", image.getAbsolutePath());
+            //result.put("image", image.getAbsolutePath());
+            result.put("thumbnail", image.getAbsolutePath());
         }
 
-        result.put("file", file.getAbsolutePath());
+        //result.put("file", file.getAbsolutePath());
+        result.put("url", file.getAbsolutePath());
 
         return result;
     }

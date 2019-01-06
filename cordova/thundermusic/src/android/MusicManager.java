@@ -18,6 +18,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ResultReceiver;
+import android.util.Log;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -69,45 +70,53 @@ public class MusicManager
                         }
                     }
                 }
+            } catch (Exception e) {
+                Log.e("TM-MusicManager", "Error while loading cache file", e);
+                cacheFile.delete();
+                this.songs = new ArrayList<>();
             }
         }
 
         File[] files = songFolder.listFiles();
         for (File file : files) {
-            if (!file.getName().endsWith(".mp3")) {
-                continue;
-            }
-
-            Song original = null;
-            for (Song song : songs) {
-                if (song.getFile().getAbsolutePath().equals(file.getAbsolutePath())) {
-                    original = song;
-                    break;
-                }
-            }
-
-            if (original == null) {
-                AudioFile audio = AudioFileIO.read(file);
-                String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                String artist = "Artiste inconnu";
-
-                Tag tags = audio.getTag();
-                if (tags != null) {
-                    title = tags.getFirst(FieldKey.TITLE);
-                    artist = tags.getFirst(FieldKey.ARTIST);
+            try {
+                if (!file.getName().endsWith(".mp3")) {
+                    continue;
                 }
 
-                Song song = create(new Song(
-                    UUID.randomUUID().toString().substring(0, 10),
-                    title,
-                    artist,
-                    null,
-                    file
-                ), null, false);
+                Song original = null;
+                for (Song song : songs) {
+                    if (song.getFile().getAbsolutePath().equals(file.getAbsolutePath())) {
+                        original = song;
+                        break;
+                    }
+                }
 
-                updateThumb(song);
-            } else if (original.getImage() != null && !original.getImage().exists()) {
-                updateThumb(original);
+                if (original == null) {
+                    AudioFile audio = AudioFileIO.read(file);
+                    String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
+                    String artist = "Artiste inconnu";
+
+                    Tag tags = audio.getTag();
+                    if (tags != null) {
+                        title = tags.getFirst(FieldKey.TITLE);
+                        artist = tags.getFirst(FieldKey.ARTIST);
+                    }
+
+                    Song song = create(new Song(
+                        UUID.randomUUID().toString().substring(0, 10),
+                        title,
+                        artist,
+                        null,
+                        file
+                    ), null, false);
+
+                    updateThumb(song);
+                } else if (original.getImage() != null && !original.getImage().exists()) {
+                    updateThumb(original);
+                }
+            } catch (Exception e) {
+                Log.e("TM-MusicManager", "Error while loading one of the songs (" + file.getName() + ")", e);
             }
         }
 
@@ -137,6 +146,7 @@ public class MusicManager
 
     public Song create(Song song, byte[] thumbnail, boolean updateCache) throws Exception
     {
+        System.out.println("mmmh la creation de chanson : " + song.getTitle());
         songs.add(song);
 
         if (updateCache) {
@@ -251,6 +261,8 @@ public class MusicManager
             }
 
             writer.write(songs.toString());
+        } catch (Exception e) {
+            Log.e("TM-MusicManager", "Error while writing cache", e);
         }
 
         JSONObject event = new JSONObject();

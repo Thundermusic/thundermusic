@@ -47,6 +47,11 @@
 
         <framework src="plugin.gradle" custom="true" type="gradleReference"/>
         <framework src="com.android.support:support-core-utils:27.0.0" />
+
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
     </platform>
 
      <!-- ios -->
