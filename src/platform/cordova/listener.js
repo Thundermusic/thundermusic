@@ -1,22 +1,14 @@
 /* eslint-disable no-undef */
 
 export let musics = null;
-export let downloads = {};
-export let callbacks = {};
+export let callbacks = {
+  downloads: {}
+};
 
 export function init() {
   document.addEventListener("deviceready", () => {
     listen();
-    cordova.exec(
-      () => {
-        console.log("init is gud");
-      },
-      err => {
-        console.log("init no gud : " + err);
-      },
-      "Thundermusic",
-      "init"
-    );
+    cordova.exec(() => {}, () => {}, "Thundermusic", "init");
   });
 }
 
@@ -38,10 +30,21 @@ function listen() {
 
           break;
         case "downloads":
-          downloads = event.downloads;
+          for (let cbId of Object.keys(callbacks.downloads)) {
+            let song = null;
+            for (let s of event.downloads) {
+              if (s.id === cbId) {
+                song = s;
+                break;
+              }
+            }
 
-          if (callbacks.downloads) {
-            callbacks.downloads();
+            if (song == null) {
+              callbacks.downloads[cbId](-2);
+              delete callbacks.downloads[cbId];
+            } else {
+              callbacks.downloads[cbId](song.progress);
+            }
           }
 
           break;
