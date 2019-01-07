@@ -118,6 +118,9 @@ public class Thundermusic extends CordovaPlugin
                     eventManager.error("Error while parsing song infos : " + e.getMessage());
                 }
                 break;
+            case "set-infos":
+                setMusicInfos(Song.fromJSON(args.getJSONObject(0)));
+                break;
             default:
                 return false;
         }
@@ -130,5 +133,9 @@ public class Thundermusic extends CordovaPlugin
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults)
     {
         load();
+    }
+
+    protected void setMusicInfos(Song song) {
+
     }
 }

@@ -2,6 +2,7 @@ import Vue from "vue";
 import { addHandlers, cleanupMusic, storage } from "platform";
 
 export const state = {
+  initialized: false,
   musics: [],
   playlists: {},
   currentPlaylist: undefined,
@@ -35,6 +36,7 @@ export const mutations = {
   },
   [types.SET_MUSICS](state, musics) {
     state.musics = musics;
+    state.initialized = true;
   },
   [types.SET_PLAYLIST](state, playlist) {
     state.currentPlaylist = playlist;

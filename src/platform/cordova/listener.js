@@ -2,7 +2,8 @@
 
 export let musics = null;
 export let callbacks = {
-  downloads: {}
+  downloads: {},
+  media: {}
 };
 
 export function init() {
@@ -46,7 +47,11 @@ function listen() {
               callbacks.downloads[cbId](song.progress);
             }
           }
-
+          break;
+        case "handler":
+          if (callbacks.media[event.handler]) {
+            callbacks.media[event.handler]();
+          }
           break;
       }
 

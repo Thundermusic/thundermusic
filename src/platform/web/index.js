@@ -1,6 +1,7 @@
 export { getPlaylistContent, getPlaylistInfos } from "./youtube/api";
 export { default as providers } from "./providers";
 import * as storage from "platform/storage";
+import * as notification from "platform/notification";
 export { storage };
 export { cleanupMusic } from "platform/sw-client";
 
@@ -29,32 +30,11 @@ export async function addHandlers({
     audio.addEventListener("ended", () => onEnd());
   }
 
-  if ("mediaSession" in navigator) {
-    onPlay && navigator.mediaSession.setActionHandler("play", onPlay);
-    onPause && navigator.mediaSession.setActionHandler("pause", onPause);
-    onNext && navigator.mediaSession.setActionHandler("nexttrack", onNext);
-    onPrevious &&
-      navigator.mediaSession.setActionHandler("previoustrack", onPrevious);
-    /*
-		navigator.mediaSession.setActionHandler("seekbackward", () => {});
-		navigator.mediaSession.setActionHandler("seekforward", () => {});
-    */
-  }
+  notification.addHandlers({ onPlay, onPause, onNext, onPrevious });
 }
 
 export async function setMusic(music) {
-  if ("mediaSession" in navigator) {
-    navigator.mediaSession.metadata = new window.MediaMetadata({
-      title: music.title,
-      artist: music.channel,
-      album: undefined,
-      artwork: [
-        {
-          src: music.thumbnail || require("../../assets/thumbnail_default.png")
-        }
-      ]
-    });
-  }
+  notification.setMusic(music);
   audio.src = await music.url;
 }
 export function play() {

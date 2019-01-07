@@ -1,5 +1,7 @@
 <template>
     <div id="musics">
+        <loading :isLoading="!initialized" />
+
         <music-list
             :musics="playlist ? getMusicsByPlaylist(playlist) : musics"
             :selected="current && [current.id]"
@@ -40,14 +42,15 @@
 import MusicList from "../components/MusicList";
 import EditDialog from "../components/EditDialog";
 import DeleteDialog from "../components/DeleteDialog";
+import Loading from "../components/Loading";
 import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
   props: ["playlist"],
   name: "musics",
-  components: { MusicList, EditDialog, DeleteDialog },
+  components: { MusicList, EditDialog, DeleteDialog, Loading },
   computed: {
-    ...mapState("musics", ["musics", "playlists"]),
+    ...mapState("musics", ["musics", "playlists", "initialized"]),
     ...mapGetters("musics", ["getMusicsByPlaylist"]),
     ...mapState("player", ["current"]),
     ...mapState("downloader", ["progress"])
