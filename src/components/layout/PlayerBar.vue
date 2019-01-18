@@ -1,12 +1,12 @@
 <template>
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
-			<v-flex class="pl-2 pt-2 music flex-0">
+			<v-flex class="pl-2 music flex-0">
 				<div class="disk" :class="{ paused }" v-if="showDisk">
           <img v-if="current.thumbnail" :src="current.thumbnail">
 					<span class="inner"/>
 				</div>
-				<div class="infos">
+				<div class="infos pt-2 pb-1">
 					<span class="title">{{ current.title }}</span>
 					<span class="artist">{{ current.artist || current.channel }}</span>
 				</div>
@@ -97,6 +97,8 @@ $xs-bar-height: 56px;
 
   .music {
     min-width: 250px;
+    display: flex;
+    align-items: center;
   }
 
   .volume {
