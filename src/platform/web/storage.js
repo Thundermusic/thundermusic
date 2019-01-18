@@ -50,7 +50,7 @@ export async function getMusics() {
 
 export async function addPlaylist(playlist) {
   const tx = (await db).transaction("playlists", "readwrite");
-  tx.objectStore("playlists").add(playlist);
+  tx.objectStore("playlists").put(playlist);
   return tx.complete;
 }
 
