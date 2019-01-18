@@ -17,7 +17,7 @@
 						<span>{{ position | duration }}</span>
 					</v-flex>
 					<v-flex class="display-flex">
-						<v-slider hide-details class="px-2 ma-0 mx-3 slider" color="primary" :value="position" @input="seek" :max="duration"></v-slider>
+						<v-slider hide-details class="px-2 ma-0 mx-3 slider" color="primary" :value="position" @input="seek" @click.native.stop :max="duration"></v-slider>
 					</v-flex>
 					<v-flex class="flex-0 display-flex">
 						<span>{{ duration | duration }}</span>
