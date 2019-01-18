@@ -1,9 +1,10 @@
 <template>
     <div id="settings">
-        Paramètres
-        <v-container fluid px-0>
-            <v-switch label="Show Disk" :inputValue="showDisk" @change="value => set({ key: 'showDisk', value })"></v-switch>
-            <v-switch label="Dark" :inputValue="dark" @change="value => set({ key: 'dark', value })"></v-switch>
+        <v-container fluid py-0>
+            <v-subheader>UI</v-subheader>
+            <v-switch label="Show Disk" :inputValue="showDisk" @change="value => set({ key: 'showDisk', value })" ma-0 hide-details></v-switch>
+            <v-switch label="Dark Theme" :inputValue="dark" @change="value => set({ key: 'dark', value })" hide-details></v-switch>
+            <v-subheader>Sync</v-subheader>
         </v-container>
     </div>
 </template>
