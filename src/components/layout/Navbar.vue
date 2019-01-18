@@ -33,7 +33,7 @@
 				:to="{ name: 'playlist', params: { playlist: playlist.id }}"
         class="playlist"
 			>
-				<v-list-tile-content>{{ playlist.title }}</v-list-tile-content>
+				<v-list-tile-action>{{ playlist.title }}</v-list-tile-action>
 			</v-list-tile>
 		</v-list>
     <create-playlist-dialog v-model="create"/>
