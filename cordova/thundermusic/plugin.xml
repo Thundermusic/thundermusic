@@ -40,10 +40,13 @@
 
         <source-file src="src/android/DownloadManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/EventManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicControlBroadcastReceiver.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicControlNotification.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/MusicManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Song.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/SongToDownload.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Thundermusic.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/ThundermusicService.java" target-dir="src/fr/litarvan/thundermusic/core" />
 
         <framework src="plugin.gradle" custom="true" type="gradleReference"/>
         <framework src="com.android.support:support-core-utils:27.0.0" />
