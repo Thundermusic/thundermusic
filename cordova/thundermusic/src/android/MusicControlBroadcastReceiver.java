@@ -1,19 +1,21 @@
 package fr.litarvan.thundermusic.core;
 
-import java.io.IOException;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class MusicControlBroadcastReceiver extends BroadcastReceiver
 {
     private MusicPlayer player;
 
-    public MusicControlBroadcastReceiver(EventManager player)
+    public MusicControlBroadcastReceiver(MusicPlayer player)
     {
         this.player = player;
     }
@@ -27,13 +29,17 @@ public class MusicControlBroadcastReceiver extends BroadcastReceiver
 
         switch (intent.getAction()) {
             case "music-controls-next":
-                send("onNext");
+                emitHandler("onNext");
                 break;
             case "music-controls-previous":
-                send("onPrevious");
+                emitHandler("onPrevious");
                 break;
             case "music-controls-pause":
-                send("onPause");
+                if (player.isPaused()) {
+                    emitHandler("onPlay");
+                } else {
+                    emitHandler("onPause");
+                }
                 break;
             case "music-controls-media-button":
                 KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
@@ -43,38 +49,52 @@ public class MusicControlBroadcastReceiver extends BroadcastReceiver
                 int keyCode = event.getKeyCode();
                 switch (keyCode) {
                     case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        send("onNext");
+                        emitHandler("onNext");
                         break;
                     case KeyEvent.KEYCODE_MEDIA_PAUSE:
                     case KeyEvent.KEYCODE_MEDIA_PLAY:
                     case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                        send("onPause");
+                        if (player.isPaused()) {
+                            emitHandler("onPlay");
+                        } else {
+                            emitHandler("onPause");
+                        }
                         break;
                     case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        send("onPrevious");
+                        emitHandler("onPrevious");
+                        break;
+                    default:
+                        System.out.println("BOUTON INCONNU : " + keyCode);
                         break;
                 }
                 break;
-            /*case "music-controls-destroy":
-                send("stop");
-                break;*/
+            case "music-controls-destroy":
+                this.player.destroy();
+                break;
             default:
-                // TODO: Headphone disconnect event
-                System.out.println("Unknown event : " + intent.getAction());
+                System.out.println("AHHHHHHHHHHH : " + intent.getAction());
                 break;
         }
     }
 
-    protected void send(String handler) {
-        JSONObject obj = new JSONObject();
-
+    protected void emitHandler(String handler) {
         try {
-            obj.put("type", "handler");
-            obj.put("handler", handler);
+            JSONObject object = new JSONObject();
+            object.put("type", "handler");
+            object.put("handler", handler);
 
-            eventManager.emit(obj);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("event", object.toString());
+
+            player.getResultReceiver().send(ThundermusicService.RSP_EVENT, bundle);
         } catch (JSONException e) {
-            eventManager.error("Error while sending handler JSON : " + e.getMessage());
+            Log.e("Thundermusic", "Error while sending handler event", e);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("error", "Error while sending handler event : " + e.getMessage());
+
+            player.getResultReceiver().send(ThundermusicService.RSP_ERROR, bundle);
         }
     }
 }

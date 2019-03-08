@@ -1,22 +1,21 @@
 package fr.litarvan.thundermusic.core;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import fr.litarvan.thundermusic.MainActivity;
 import fr.litarvan.thundermusic.R;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class MusicControlNotification
 {
@@ -116,9 +115,9 @@ public class MusicControlNotification
         PendingIntent nextPendingIntent = PendingIntent.getBroadcast(context, 1, nextIntent, 0);
         builder.addAction(R.drawable.ic_next, "", nextPendingIntent);
 
-        /*Intent destroyIntent = new Intent("music-controls-destroy");
+        Intent destroyIntent = new Intent("music-controls-destroy");
         PendingIntent destroyPendingIntent = PendingIntent.getBroadcast(context, 1, destroyIntent, 0);
-        builder.addAction(R.drawable.ic_close, "", destroyPendingIntent);*/
+        builder.addAction(R.drawable.ic_close, "", destroyPendingIntent);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
             builder.setStyle(new Notification.MediaStyle().setShowActionsInCompactView(0, 1, 2, 4));

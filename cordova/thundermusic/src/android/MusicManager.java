@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
+import android.media.MediaMetadataRetriever;
 import android.os.Environment;
 import android.util.Log;
 import org.jaudiotagger.audio.AudioFile;
@@ -36,10 +37,13 @@ public class MusicManager
     private File cacheFile;
     private List<Song> songs;
 
-    public MusicManager(Context context, EventManager eventManager)
+    private Runnable onUpdate;
+
+    public MusicManager(Context context, EventManager eventManager, Runnable onUpdate)
     {
         this.context = context;
         this.eventManager = eventManager;
+        this.onUpdate = onUpdate;
     }
 
     public void load() throws Exception
@@ -75,6 +79,8 @@ public class MusicManager
             }
         }
 
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
         File[] files = songFolder.listFiles();
         for (File file : files) {
             try {
@@ -101,10 +107,17 @@ public class MusicManager
                         artist = tags.getFirst(FieldKey.ARTIST);
                     }
 
+                    retriever.setDataSource(file.getAbsolutePath());
+                    // TODO: Convert mp3 tag reader to retriever way
+                    long duration = Long.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
+                    long seconds = duration % 60;
+                    long minutes = (duration - seconds) / 60;
+
                     create(new Song(
                         UUID.randomUUID().toString().substring(0, 10),
                         title,
                         artist,
+                        minutes + ":" + (seconds < 10 ? "0" : "") + seconds,
                         null,
                         file
                     ), null, false);
@@ -115,6 +128,8 @@ public class MusicManager
                 Log.e("TM-MusicManager", "Error while loading one of the songs (" + file.getName() + ")", e);
             }
         }
+
+        retriever.release();
 
         updateCache();
     }
@@ -133,6 +148,7 @@ public class MusicManager
             downloaded.getId(),
             downloaded.getTitle(),
             downloaded.getArtist(),
+            "3:21", // TODO
             null,
             file
         );
@@ -273,5 +289,12 @@ public class MusicManager
         event.put("songs", array);
 
         eventManager.emit(event);
+
+        onUpdate.run();
+    }
+
+    public List<Song> getSongs()
+    {
+        return songs;
     }
 }
