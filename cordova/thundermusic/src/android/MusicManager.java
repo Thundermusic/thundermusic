@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.ResultReceiver;
 import android.util.Log;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -49,7 +47,7 @@ public class MusicManager
         songFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
         songFolder.mkdirs();
 
-        cacheFile = new File(context.getCacheDir(), "musics.json");
+        cacheFile = new File(context.getCacheDir(), "musics-v2.json");
         songs = new ArrayList<>();
 
         if (cacheFile.exists()) {
@@ -103,16 +101,14 @@ public class MusicManager
                         artist = tags.getFirst(FieldKey.ARTIST);
                     }
 
-                    Song song = create(new Song(
+                    create(new Song(
                         UUID.randomUUID().toString().substring(0, 10),
                         title,
                         artist,
                         null,
                         file
                     ), null, false);
-
-                    updateThumb(song);
-                } else if (original.getImage() != null && !original.getImage().exists()) {
+                } else if (original.getThumbnail() != null && !original.getThumbnail().exists()) {
                     updateThumb(original);
                 }
             } catch (Exception e) {
@@ -147,13 +143,13 @@ public class MusicManager
     public Song create(Song song, byte[] thumbnail, boolean updateCache) throws Exception
     {
         System.out.println("mmmh la creation de chanson : " + song.getTitle());
-        songs.add(song);
 
         if (updateCache) {
             writeTags(song, thumbnail);
         }
 
         updateThumb(song);
+        songs.add(song);
 
         if (updateCache) {
             updateCache();
@@ -210,7 +206,7 @@ public class MusicManager
                     out.write(image);
                 }
 
-                song.setImage(thumb);
+                song.setThumbnail(thumb);
             }
         }
     }
@@ -254,6 +250,7 @@ public class MusicManager
         });
 
         JSONArray songs = new JSONArray();
+        cacheFile.delete();
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cacheFile)))) {
             for (Song song : this.songs) {

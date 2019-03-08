@@ -10,15 +10,15 @@ public class Song
     private String id;
     private String title;
     private String artist;
-    private File image;
+    private File thumbnail;
     private File file;
 
-    public Song(String id, String title, String artist, File image, File file)
+    public Song(String id, String title, String artist, File thumbnail, File file)
     {
         this.id = id;
         this.title = title;
         this.artist = artist;
-        this.image = image;
+        this.thumbnail = thumbnail;
         this.file = file;
     }
 
@@ -37,14 +37,14 @@ public class Song
         return artist;
     }
 
-    public File getImage()
+    public File getThumbnail()
     {
-        return image;
+        return thumbnail;
     }
 
-    public void setImage(File image)
+    public void setThumbnail(File thumbnail)
     {
-        this.image = image;
+        this.thumbnail = thumbnail;
     }
 
     public File getFile()
@@ -54,7 +54,7 @@ public class Song
 
     public static Song fromJSON(JSONObject song) throws JSONException
     {
-        File image = song.has("image") ? new File(song.getString("image")) : null;
+        File image = song.has("thumbnail") ? new File(song.getString("thumbnail")) : null;
 
         return new Song(
             song.getString("id"),
@@ -73,13 +73,11 @@ public class Song
         result.put("title", title);
         result.put("artist", artist);
 
-        if (image != null) {
-            //result.put("image", image.getAbsolutePath());
-            result.put("thumbnail", image.getAbsolutePath());
+        if (thumbnail != null) {
+            result.put("thumbnail", thumbnail.getAbsolutePath());
         }
 
-        //result.put("file", file.getAbsolutePath());
-        result.put("url", file.getAbsolutePath());
+        result.put("file", file.getAbsolutePath());
 
         return result;
     }
