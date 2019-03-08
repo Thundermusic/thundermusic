@@ -23,8 +23,14 @@ export function updateMusic(music) {
 export function getMusics() {
   return new Promise(resolve => {
     if (musics === null) {
+      console.log("Getting musics");
       init();
+      console.log("Started...");
+      console.log("Callbacks ? ");
+      console.log(callbacks);
+
       callbacks.musics = () => {
+        console.log("done");
         resolve(musics);
       };
     } else {
@@ -56,7 +62,7 @@ export async function setSetting(key, value) {
 
 export async function getSettings() {
   if (settings == null) {
-    settings = JSON.parse(localStorage.getItem("settings"));
+    settings = JSON.parse(localStorage.getItem("settings") || "{}");
   }
 
   const result = [];

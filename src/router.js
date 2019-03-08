@@ -6,6 +6,8 @@ import Musics from "@/views/Musics.vue";
 import Playlists from "@/views/Playlists.vue";
 import Settings from "@/views/Settings.vue";
 
+import { routerMode } from "platform/router";
+
 Vue.use(Router);
 
 export const routes = [
@@ -60,7 +62,9 @@ export const routes = [
   }
 ];
 
+console.log("MODE ? " + routerMode);
+
 export default new Router({
-  mode: process.env.CORDOVA_PLATFORM ? "hash" : "history",
+  mode: routerMode,
   routes
 });

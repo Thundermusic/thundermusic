@@ -9,7 +9,10 @@ const store = new Vuex.Store({
 });
 
 for (const module in modules) {
-  store.dispatch(`${module}/load`);
+  store.dispatch(`${module}/load`).catch(err => {
+    console.error(`Error during loading of module '${module}'`);
+    console.log(err);
+  });
 }
 
 export default store;

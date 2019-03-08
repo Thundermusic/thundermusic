@@ -11,6 +11,7 @@
   "dependencies": {
     "cordova-android": "^7.1.4",
     "cordova-ios": "^4.5.5",
+    "cordova-plugin-thundermusic": "file:thundermusic",
     "cordova-plugin-whitelist": "^1.3.3"
   },
   "cordova": {
