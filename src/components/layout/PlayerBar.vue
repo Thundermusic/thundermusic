@@ -3,7 +3,7 @@
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
 			<v-flex class="pl-2 music flex-0">
 				<div class="disk" :class="{ paused }" v-if="showDisk">
-          <img v-if="current.thumbnail" :src="current.thumbnail">
+          			<img v-if="current.thumbnail" :src="current.thumbnail">
 					<span class="inner"/>
 				</div>
 				<div class="infos pt-2 pb-1">

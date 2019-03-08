@@ -6,7 +6,7 @@ import Musics from "@/views/Musics.vue";
 import Playlists from "@/views/Playlists.vue";
 import Settings from "@/views/Settings.vue";
 
-import { routerMode } from "platform/router";
+import { routerMode } from "platform";
 
 Vue.use(Router);
 
@@ -61,8 +61,6 @@ export const routes = [
     }
   }
 ];
-
-console.log("MODE ? " + routerMode);
 
 export default new Router({
   mode: routerMode,

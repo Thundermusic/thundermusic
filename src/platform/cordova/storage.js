@@ -23,14 +23,9 @@ export function updateMusic(music) {
 export function getMusics() {
   return new Promise(resolve => {
     if (musics === null) {
-      console.log("Getting musics");
       init();
-      console.log("Started...");
-      console.log("Callbacks ? ");
-      console.log(callbacks);
 
       callbacks.musics = () => {
-        console.log("done");
         resolve(musics);
       };
     } else {
