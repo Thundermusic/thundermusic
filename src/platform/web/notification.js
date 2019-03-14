@@ -12,7 +12,7 @@ export function setMusic(music) {
   if ("mediaSession" in navigator) {
     navigator.mediaSession.metadata = new window.MediaMetadata({
       title: music.title,
-      artist: music.channel,
+      artist: music.artist,
       album: undefined,
       artwork: [
         {

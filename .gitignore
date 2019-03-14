@@ -11,3 +11,6 @@ thundermusic-android/app/src/main/assets/www/*
 /public/cordova.js
 
 cordova-dist/
+
+build.bat
+build.sh

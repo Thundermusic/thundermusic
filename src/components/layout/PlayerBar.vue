@@ -8,7 +8,7 @@
 				</div>
 				<div class="infos pt-2 pb-1">
 					<span class="title">{{ current.title }}</span>
-					<span class="artist">{{ current.artist || current.channel }}</span>
+					<span class="artist">{{ current.artist }}</span>
 				</div>
 			</v-flex>
 			<v-flex class="slider-row">

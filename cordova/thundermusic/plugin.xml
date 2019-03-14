@@ -43,6 +43,7 @@
         <source-file src="src/android/MusicControlBroadcastReceiver.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/MusicControlNotification.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/MusicManager.java" target-dir="src/fr/litarvan/thundermusic/core" />
+        <source-file src="src/android/MusicPlayer.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Song.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/SongToDownload.java" target-dir="src/fr/litarvan/thundermusic/core" />
         <source-file src="src/android/Thundermusic.java" target-dir="src/fr/litarvan/thundermusic/core" />

@@ -69,7 +69,7 @@ export async function getSettings() {
 }
 
 /*
-    channel
+    artist
     duration
     id
     thumbnail

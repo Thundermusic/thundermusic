@@ -279,4 +279,11 @@ public class Thundermusic extends CordovaPlugin
 
         send(ThundermusicService.MSG_UPDATE, bundle);
     }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        webView.getContext().unbindService(playerConnection);
+    }
 }

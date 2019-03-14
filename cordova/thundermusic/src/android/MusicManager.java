@@ -97,15 +97,20 @@ public class MusicManager
                 }
 
                 if (original == null) {
-                    AudioFile audio = AudioFileIO.read(file);
-                    String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                    String artist = "Artiste inconnu";
+					String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
+					String artist = "Artiste inconnu";
 
-                    Tag tags = audio.getTag();
-                    if (tags != null) {
-                        title = tags.getFirst(FieldKey.TITLE);
-                        artist = tags.getFirst(FieldKey.ARTIST);
-                    }
+					try {
+						AudioFile audio = AudioFileIO.read(file);
+
+						Tag tags = audio.getTag();
+						if (tags != null) {
+							title = tags.getFirst(FieldKey.TITLE);
+							artist = tags.getFirst(FieldKey.ARTIST);
+						}
+					} catch (Exception e) {
+						Log.e("TM-MusicManager", "Error while reading song tags of (" + file.getName() + ")", e);
+					}
 
                     retriever.setDataSource(file.getAbsolutePath());
                     // TODO: Convert mp3 tag reader to retriever way
@@ -164,7 +169,12 @@ public class MusicManager
             writeTags(song, thumbnail);
         }
 
-        updateThumb(song);
+        try {
+            updateThumb(song);
+        } catch (Exception e) {
+            Log.e("TM-MusicManager", "Error while loading one of the songs thumbnails (" + song.getFile().getName() + ")", e);
+        }
+
         songs.add(song);
 
         if (updateCache) {

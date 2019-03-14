@@ -6,7 +6,7 @@ export function swDownload(getMeta) {
 
     // eslint-disable-next-line no-undef
     cordova.exec(() => {}, () => {}, "Thundermusic", "download", [
-      { ...music, artist: music.channel, url }
+      { ...music, artist: music.artist, url }
     ]);
 
     await new Promise(resolve => {

@@ -26,7 +26,7 @@ function mapSnippets(items) {
     }) => ({
       id: idVideoId || rIdVideoId,
       title,
-      channel,
+      artist: channel,
       thumbnail,
       duration: null,
       youtube: {

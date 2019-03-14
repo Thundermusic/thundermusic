@@ -157,10 +157,10 @@ function extract(videoTitle, channel) {
 }
 
 export default function(music) {
-  const extracted = extract(music.title, music.channel);
+  const extracted = extract(music.title, music.artist);
 
   music.title = extracted.title;
-  music.channel = extracted.artist;
+  music.artist = extracted.artist;
 
   return music;
 }

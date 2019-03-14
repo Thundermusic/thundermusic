@@ -5,7 +5,7 @@
                 <v-card-title class="headline">Editer la chanson</v-card-title>
 
                 <v-card-text>
-                    <v-text-field solo autocomplete="off" spellcheck="false" autocorrect="off" v-model="song.channel" placeholder="Artiste" />
+                    <v-text-field solo autocomplete="off" spellcheck="false" autocorrect="off" v-model="song.artist" placeholder="Artiste" />
                     <v-text-field solo autocomplete="off" spellcheck="false" autocorrect="off" v-model="song.title" placeholder="Titre" />
                 </v-card-text>
 
@@ -38,9 +38,9 @@ export default {
   methods: {
     apply() {
       this.song.title = this.song.title.trim();
-      this.song.channel = this.song.channel.trim();
+      this.song.artist = this.song.artist.trim();
 
-      if (this.song.title === "" || this.song.channel === "") {
+      if (this.song.title === "" || this.song.artist === "") {
         return;
       }
 
