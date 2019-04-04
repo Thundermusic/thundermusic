@@ -24,6 +24,7 @@ export function getMusics() {
   return new Promise(resolve => {
     if (musics === null) {
       init();
+
       callbacks.musics = () => {
         resolve(musics);
       };
@@ -56,7 +57,7 @@ export async function setSetting(key, value) {
 
 export async function getSettings() {
   if (settings == null) {
-    settings = JSON.parse(localStorage.getItem("settings"));
+    settings = JSON.parse(localStorage.getItem("settings") || "{}");
   }
 
   const result = [];
@@ -68,7 +69,7 @@ export async function getSettings() {
 }
 
 /*
-    channel
+    artist
     duration
     id
     thumbnail

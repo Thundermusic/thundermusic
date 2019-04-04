@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 import android.content.Context;
-import android.os.Bundle;
+import android.media.MediaMetadataRetriever;
 import android.os.Environment;
-import android.os.ResultReceiver;
 import android.util.Log;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -38,10 +37,13 @@ public class MusicManager
     private File cacheFile;
     private List<Song> songs;
 
-    public MusicManager(Context context, EventManager eventManager)
+    private Runnable onUpdate;
+
+    public MusicManager(Context context, EventManager eventManager, Runnable onUpdate)
     {
         this.context = context;
         this.eventManager = eventManager;
+        this.onUpdate = onUpdate;
     }
 
     public void load() throws Exception
@@ -49,7 +51,7 @@ public class MusicManager
         songFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
         songFolder.mkdirs();
 
-        cacheFile = new File(context.getCacheDir(), "musics.json");
+        cacheFile = new File(context.getCacheDir(), "musics-v2.json");
         songs = new ArrayList<>();
 
         if (cacheFile.exists()) {
@@ -77,6 +79,8 @@ public class MusicManager
             }
         }
 
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+
         File[] files = songFolder.listFiles();
         for (File file : files) {
             try {
@@ -93,32 +97,44 @@ public class MusicManager
                 }
 
                 if (original == null) {
-                    AudioFile audio = AudioFileIO.read(file);
-                    String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                    String artist = "Artiste inconnu";
+					String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
+					String artist = "Artiste inconnu";
 
-                    Tag tags = audio.getTag();
-                    if (tags != null) {
-                        title = tags.getFirst(FieldKey.TITLE);
-                        artist = tags.getFirst(FieldKey.ARTIST);
-                    }
+					try {
+						AudioFile audio = AudioFileIO.read(file);
 
-                    Song song = create(new Song(
+						Tag tags = audio.getTag();
+						if (tags != null) {
+							title = tags.getFirst(FieldKey.TITLE);
+							artist = tags.getFirst(FieldKey.ARTIST);
+						}
+					} catch (Exception e) {
+						Log.e("TM-MusicManager", "Error while reading song tags of (" + file.getName() + ")", e);
+					}
+
+                    retriever.setDataSource(file.getAbsolutePath());
+                    // TODO: Convert mp3 tag reader to retriever way
+                    long duration = Long.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
+                    long seconds = duration % 60;
+                    long minutes = (duration - seconds) / 60;
+
+                    create(new Song(
                         UUID.randomUUID().toString().substring(0, 10),
                         title,
                         artist,
+                        minutes + ":" + (seconds < 10 ? "0" : "") + seconds,
                         null,
                         file
                     ), null, false);
-
-                    updateThumb(song);
-                } else if (original.getImage() != null && !original.getImage().exists()) {
+                } else if (original.getThumbnail() != null && !original.getThumbnail().exists()) {
                     updateThumb(original);
                 }
             } catch (Exception e) {
                 Log.e("TM-MusicManager", "Error while loading one of the songs (" + file.getName() + ")", e);
             }
         }
+
+        retriever.release();
 
         updateCache();
     }
@@ -137,6 +153,7 @@ public class MusicManager
             downloaded.getId(),
             downloaded.getTitle(),
             downloaded.getArtist(),
+            "3:21", // TODO
             null,
             file
         );
@@ -147,13 +164,18 @@ public class MusicManager
     public Song create(Song song, byte[] thumbnail, boolean updateCache) throws Exception
     {
         System.out.println("mmmh la creation de chanson : " + song.getTitle());
-        songs.add(song);
 
         if (updateCache) {
             writeTags(song, thumbnail);
         }
 
-        updateThumb(song);
+        try {
+            updateThumb(song);
+        } catch (Exception e) {
+            Log.e("TM-MusicManager", "Error while loading one of the songs thumbnails (" + song.getFile().getName() + ")", e);
+        }
+
+        songs.add(song);
 
         if (updateCache) {
             updateCache();
@@ -210,7 +232,7 @@ public class MusicManager
                     out.write(image);
                 }
 
-                song.setImage(thumb);
+                song.setThumbnail(thumb);
             }
         }
     }
@@ -254,6 +276,7 @@ public class MusicManager
         });
 
         JSONArray songs = new JSONArray();
+        cacheFile.delete();
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cacheFile)))) {
             for (Song song : this.songs) {
@@ -276,5 +299,12 @@ public class MusicManager
         event.put("songs", array);
 
         eventManager.emit(event);
+
+        onUpdate.run();
+    }
+
+    public List<Song> getSongs()
+    {
+        return songs;
     }
 }

@@ -9,7 +9,7 @@
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                         <v-list-tile-title class="music-title">{{ music.title }}</v-list-tile-title>
-                        <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist || music.channel }}</v-list-tile-sub-title>
+                        <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist }}</v-list-tile-sub-title>
                         <v-list-tile-sub-title>{{ isDownloading(music) ? 'Téléchargement...' : (hasMusic && hasMusic(music) ? 'Déjà ajoutée' : music.duration || '?') }}</v-list-tile-sub-title>
                     </v-list-tile-content>
                     <v-progress-linear

@@ -10,6 +10,10 @@ export function init() {
   document.addEventListener("deviceready", () => {
     listen();
     cordova.exec(() => {}, () => {}, "Thundermusic", "init");
+
+    setInterval(() => {
+      cordova.exec(() => {}, () => {}, "Thundermusic", "position");
+    }, 500);
   });
 }
 
@@ -50,8 +54,16 @@ function listen() {
           break;
         case "handler":
           if (callbacks.media[event.handler]) {
-            callbacks.media[event.handler]();
+            if (event.handler === "onPositionChange") {
+              callbacks.media["onPositionChange"](
+                event.position / 1000,
+                event.duration / 1000
+              );
+            } else {
+              callbacks.media[event.handler]();
+            }
           }
+
           break;
       }
 

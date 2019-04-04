@@ -118,9 +118,11 @@ export default {
       const meta = this.providers[this.currentProvider].getMeta(music);
       this.metas[music.id] = meta;
 
-      this.$store.dispatch("player/setMusic", {
-        ...music,
-        url: meta.then(({ url }) => url)
+      meta.then(({ url }) => {
+        this.$store.dispatch("player/setMusic", {
+          ...music,
+          url
+        });
       });
     },
     download(music) {

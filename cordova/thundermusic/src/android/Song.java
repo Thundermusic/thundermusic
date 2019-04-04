@@ -10,15 +10,17 @@ public class Song
     private String id;
     private String title;
     private String artist;
-    private File image;
+    private String duration;
+    private File thumbnail;
     private File file;
 
-    public Song(String id, String title, String artist, File image, File file)
+    public Song(String id, String title, String artist, String duration, File thumbnail, File file)
     {
         this.id = id;
         this.title = title;
         this.artist = artist;
-        this.image = image;
+        this.duration = duration;
+        this.thumbnail = thumbnail;
         this.file = file;
     }
 
@@ -37,14 +39,19 @@ public class Song
         return artist;
     }
 
-    public File getImage()
+    public String getDuration()
     {
-        return image;
+        return duration;
     }
 
-    public void setImage(File image)
+    public File getThumbnail()
     {
-        this.image = image;
+        return thumbnail;
+    }
+
+    public void setThumbnail(File thumbnail)
+    {
+        this.thumbnail = thumbnail;
     }
 
     public File getFile()
@@ -54,14 +61,15 @@ public class Song
 
     public static Song fromJSON(JSONObject song) throws JSONException
     {
-        File image = song.has("image") ? new File(song.getString("image")) : null;
+        File image = song.has("thumbnail") ? new File(song.getString("thumbnail")) : null;
 
         return new Song(
             song.getString("id"),
             song.getString("title"),
             song.getString("artist"),
+            song.getString("duration"),
             image,
-            new File(song.getString("file"))
+            new File(song.getString("url"))
         );
     }
 
@@ -72,13 +80,12 @@ public class Song
         result.put("id", id);
         result.put("title", title);
         result.put("artist", artist);
+        result.put("duration", duration);
 
-        if (image != null) {
-            //result.put("image", image.getAbsolutePath());
-            result.put("thumbnail", image.getAbsolutePath());
+        if (thumbnail != null) {
+            result.put("thumbnail", thumbnail.getAbsolutePath());
         }
 
-        //result.put("file", file.getAbsolutePath());
         result.put("url", file.getAbsolutePath());
 
         return result;

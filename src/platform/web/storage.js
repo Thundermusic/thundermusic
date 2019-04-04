@@ -1,6 +1,6 @@
 import idb from "idb";
 
-const db = idb.open("thundermusic", 2, upgradeDb => {
+const db = idb.open("thundermusic", 3, async upgradeDb => {
   /* eslint-disable no-fallthrough */
   switch (upgradeDb.oldVersion) {
     case 0: {
@@ -20,6 +20,22 @@ const db = idb.open("thundermusic", 2, upgradeDb => {
     }
     case 1:
       upgradeDb.createObjectStore("settings");
+    case 2: {
+      const tx = (await db).transaction("musics", "readwrite");
+      const store = tx.objectStore("musics");
+      const keys = await store.getAllKeys();
+
+      for (const key of keys) {
+        const music = await store.get(key);
+
+        music.artist = music.channel;
+        delete music.channel;
+
+        await store.put(music, key);
+      }
+
+      await tx.complete;
+    }
   }
 });
 
@@ -50,7 +66,7 @@ export async function getMusics() {
 
 export async function addPlaylist(playlist) {
   const tx = (await db).transaction("playlists", "readwrite");
-  tx.objectStore("playlists").add(playlist);
+  tx.objectStore("playlists").put(playlist);
   return tx.complete;
 }
 

@@ -9,3 +9,8 @@ thundermusic-android/app/src/main/assets/www/*
 /cordova/platforms
 /cordova/plugins
 /public/cordova.js
+
+cordova-dist/
+
+build.bat
+build.sh

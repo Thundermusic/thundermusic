@@ -1,13 +1,14 @@
 export { getPlaylistContent, getPlaylistInfos } from "./youtube/api";
 export { default as providers } from "./providers";
-import * as storage from "platform/storage";
-import * as notification from "platform/notification";
+import * as storage from "./storage";
+import * as notification from "./notification";
 export { storage };
-export { cleanupMusic } from "platform/sw-client";
+export { cleanupMusic } from "./sw-client";
 
 import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutube";
 
 export const playlistComponents = [ImportFromYoutube];
+export const routerMode = "history";
 
 const audio = new Audio();
 audio.volume = (localStorage.getItem("volume") || 100) / 100;

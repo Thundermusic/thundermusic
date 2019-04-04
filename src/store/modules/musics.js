@@ -117,7 +117,11 @@ export const actions = {
     });
     commit(types.SET_PLAYLIST_INDEX, index);
   },
-  previous({ dispatch, state, getters, commit }) {
+  previous({ dispatch, state, rootState, getters, commit }) {
+    if (rootState.player.position > 5) {
+      return dispatch("player/seek", 0, { root: true });
+    }
+
     let { currentPlaylistIndex: index, currentPlaylist: playlist } = state;
 
     const musics = getters.getMusicsByPlaylist(playlist);

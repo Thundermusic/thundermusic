@@ -7,7 +7,7 @@
                 <v-card-text>
                     Voulez-vous vraiment supprimer la chanson :
                     <div class="delete-title">{{ song.title }}</div>
-                    <div class="delete-artist">{{ song.channel }}</div>
+                    <div class="delete-artist">{{ song.artist }}</div>
                 </v-card-text>
 
                 <v-card-actions>

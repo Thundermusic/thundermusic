@@ -1,14 +1,14 @@
 <template>
 	<v-card class="player-bar elevation-6" :class="{ opened }">
 		<v-layout row wrap @click="$vuetify.breakpoint.xsOnly ? opened = !opened : null">
-			<v-flex class="pl-2 pt-2 music flex-0">
+			<v-flex class="pl-2 music flex-0">
 				<div class="disk" :class="{ paused }" v-if="showDisk">
-          <img v-if="current.thumbnail" :src="current.thumbnail">
+          			<img v-if="current.thumbnail" :src="current.thumbnail">
 					<span class="inner"/>
 				</div>
-				<div class="infos">
+				<div class="infos pt-2 pb-1">
 					<span class="title">{{ current.title }}</span>
-					<span class="artist">{{ current.artist || current.channel }}</span>
+					<span class="artist">{{ current.artist }}</span>
 				</div>
 			</v-flex>
 			<v-flex class="slider-row">
@@ -17,7 +17,7 @@
 						<span>{{ position | duration }}</span>
 					</v-flex>
 					<v-flex class="display-flex">
-						<v-slider hide-details class="px-2 ma-0 mx-3 slider" color="primary" :value="position" @input="seek" :max="duration"></v-slider>
+						<v-slider hide-details class="px-2 ma-0 mx-3 slider" color="primary" :value="position" @input="seek" @click.native.stop :max="duration"></v-slider>
 					</v-flex>
 					<v-flex class="flex-0 display-flex">
 						<span>{{ duration | duration }}</span>
@@ -97,6 +97,8 @@ $xs-bar-height: 56px;
 
   .music {
     min-width: 250px;
+    display: flex;
+    align-items: center;
   }
 
   .volume {
