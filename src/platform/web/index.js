@@ -13,6 +13,17 @@ export const routerMode = "history";
 const audio = new Audio();
 audio.volume = (localStorage.getItem("volume") || 100) / 100;
 
+let wakeLockObj;
+let wakeLockRequest;
+
+if ("getWakeLock" in navigator) {
+  wakeLockObj = navigator
+    .getWakeLock("screen")
+    .catch(err => console.error("Wake lock error : " + err));
+} else {
+  console.log("Wake lock function not found");
+}
+
 export async function addHandlers({
   onPositionChange,
   onPlay,
@@ -38,11 +49,27 @@ export async function setMusic(music) {
   notification.setMusic(music);
   audio.src = await music.url;
 }
+
 export function play() {
+  if (wakeLockObj) {
+    if (wakeLockRequest) {
+      wakeLockRequest.cancel();
+      wakeLockRequest = null;
+    }
+
+    if (wakeLockObj) {
+      wakeLockRequest = wakeLockObj.createRequest();
+    }
+  }
+
   return audio.play();
 }
 
 export function pause() {
+  if (wakeLockRequest) {
+    wakeLockRequest.cancel();
+  }
+
   return audio.pause();
 }
 
