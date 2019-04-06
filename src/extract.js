@@ -159,8 +159,8 @@ function extract(videoTitle, channel) {
 export default function(music) {
   const extracted = extract(music.title, music.artist);
 
-  music.title = extracted.title;
-  music.artist = extracted.artist;
+  music.title = extracted.title.replace(" Amp;", "");
+  music.artist = extracted.artist.replace(" Amp;", "");
 
   return music;
 }
