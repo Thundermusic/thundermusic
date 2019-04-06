@@ -202,7 +202,7 @@ public class Thundermusic extends CordovaPlugin
                 break;
             case "remove":
                 try {
-                    musicManager.remove(Song.fromJSON(args.getJSONObject(0)));
+                    musicManager.remove(args.getString(0));
                 } catch (Exception e) {
                     eventManager.error("Error while parsing song infos : " + e.getMessage());
                 }

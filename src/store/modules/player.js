@@ -73,7 +73,7 @@ export const actions = {
     } else {
       dispatch("pause");
       commit(types.SET_MUSIC, DEFAULT_SONG);
-      await setMusic(DEFAULT_SONG);
+      await setMusic(DEFAULT_SONG, true);
     }
   },
   load({ dispatch, commit, state }) {

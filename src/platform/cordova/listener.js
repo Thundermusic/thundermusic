@@ -45,8 +45,6 @@ function listen() {
               if (s.id === cbId) {
                 song = s;
                 break;
-              } else {
-                console.log('"' + s.id + '" !== ' + '"' + cbId + '"');
               }
             }
 

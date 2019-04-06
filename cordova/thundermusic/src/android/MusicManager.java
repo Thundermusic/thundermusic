@@ -196,7 +196,6 @@ public class MusicManager
         songs.add(song);
 
         if (updateCache) {
-            System.out.println("ON UPDATE CACHE");
             updateCache();
         }
 
@@ -218,11 +217,11 @@ public class MusicManager
         updateCache();
     }
 
-    public void remove(Song song) throws Exception
+    public void remove(String id) throws Exception
     {
         for (int i = 0; i < songs.size(); i++)
         {
-            if (songs.get(i).getId().equals(song.getId()))
+            if (songs.get(i).getId().equals(id))
             {
                 songs.get(i).getFile().delete();
                 songs.remove(i);

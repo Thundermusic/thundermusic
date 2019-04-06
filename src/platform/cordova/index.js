@@ -9,15 +9,16 @@ import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutub
 
 export const playlistComponents = [ImportFromYoutube];
 export const routerMode = "hash";
-export const shouldAdd = false;
 
 export async function addHandlers(handlers) {
   callbacks.media = { ...callbacks.media, ...handlers };
 }
 
-export async function setMusic(music) {
-  // eslint-disable-next-line no-undef
-  cordova.exec(() => {}, () => {}, "Thundermusic", "play", [music]);
+export async function setMusic(music, noLoad) {
+  if (!noLoad) {
+    // eslint-disable-next-line no-undef
+    cordova.exec(() => {}, () => {}, "Thundermusic", "play", [music]);
+  }
 }
 export async function play() {
   // eslint-disable-next-line no-undef

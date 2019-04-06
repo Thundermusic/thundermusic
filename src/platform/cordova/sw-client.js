@@ -1,12 +1,10 @@
 import { callbacks } from "./listener";
 
-export function swDownload(/*getMeta*/) {
+export function swDownload() {
   return async (music, meta, progressFn) => {
-    //const { url } = await (meta || getMeta(music));
-
     // eslint-disable-next-line no-undef
     cordova.exec(() => {}, () => {}, "Thundermusic", "download", [
-      { ...music, artist: music.artist /*, url*/ }
+      { ...music, artist: music.artist }
     ]);
 
     await new Promise(resolve => {
