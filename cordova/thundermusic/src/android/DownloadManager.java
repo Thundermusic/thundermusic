@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
+import fr.litarvan.thundermusic.BuildConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,15 +59,28 @@ public class DownloadManager
                     }
 
                     File output = musicManager.getFile(song);
+                    String url = song.getUrl();
 
-                    song.setProgress(0);
+                    song.setProgress(url == null ? -1 : 0);
                     update();
 
                     try {
-                        download(song.getUrl(), new FileOutputStream(output), song, false);
+                        if (url == null) {
+                            download(BuildConfig.API_URL + "convert?query=" + URLEncoder.encode("https://www.youtube.com/watch?v=" + song.getId(), "UTF-8"), null, null, true);
+
+                            song.setProgress(0);
+                            update();
+
+                            download(BuildConfig.API_URL + "download?id=" + song.getId(), new FileOutputStream(output), song, false);
+                        } else {
+                            download(song.getUrl(), new FileOutputStream(output), song, false);
+                        }
                     } catch (IOException e) {
                         error("Error while downloading song", e);
-                        return;
+                        output.delete();
+                        song.setProgress(-3);
+
+                        continue;
                     }
 
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -123,9 +139,9 @@ public class DownloadManager
         int count;
 
         while ((count = input.read(data)) != -1) {
-            total += count;
-
             if (song != null) {
+                total += count;
+
                 int progress = (int) (total * 100 / fileLength);
                 if (progress - lastProgress >= 10) {
                     song.setProgress(progress);
@@ -170,7 +186,7 @@ public class DownloadManager
 
         try {
             event.put("type", "downloads");
-            event.put("downloads", songs);
+            event.put("downloads", array);
         } catch (JSONException e) {
             error("Error while sending downloads event", e);
         }

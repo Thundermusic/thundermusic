@@ -7,3 +7,20 @@ repositories {
 dependencies {
     compile "com.github.AdrienPoupa:jaudiotagger:2.2.3"
 }
+
+android {
+    buildTypes {
+        def properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+        def url = properties.getProperty('api.url')
+
+        debug {
+            buildConfigField 'String', 'API_URL', url
+        }
+
+        release {
+            buildConfigField 'String', 'API_URL', url
+        }
+    }
+}

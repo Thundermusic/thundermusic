@@ -65,7 +65,7 @@ public class SongToDownload
                                   json.getString("title"),
                                   json.getString("artist"),
                                   json.getString("thumbnail"),
-                                  json.getString("url"));
+                                  json.has("url") ? json.getString("url") : null);
     }
 
     public JSONObject toJSON() throws JSONException

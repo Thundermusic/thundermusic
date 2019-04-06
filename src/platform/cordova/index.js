@@ -9,6 +9,7 @@ import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutub
 
 export const playlistComponents = [ImportFromYoutube];
 export const routerMode = "hash";
+export const shouldAdd = false;
 
 export async function addHandlers(handlers) {
   callbacks.media = { ...callbacks.media, ...handlers };

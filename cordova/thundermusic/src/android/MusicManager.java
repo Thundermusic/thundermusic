@@ -39,11 +39,15 @@ public class MusicManager
 
     private Runnable onUpdate;
 
+    private MediaMetadataRetriever retriever;
+
     public MusicManager(Context context, EventManager eventManager, Runnable onUpdate)
     {
         this.context = context;
         this.eventManager = eventManager;
         this.onUpdate = onUpdate;
+
+        this.retriever = new MediaMetadataRetriever();
     }
 
     public void load() throws Exception
@@ -105,24 +109,27 @@ public class MusicManager
 
 						Tag tags = audio.getTag();
 						if (tags != null) {
-							title = tags.getFirst(FieldKey.TITLE);
-							artist = tags.getFirst(FieldKey.ARTIST);
+							String t = tags.getFirst(FieldKey.TITLE);
+							String a = tags.getFirst(FieldKey.ARTIST);
+
+							if (t != null && !t.isEmpty()) {
+							    title = t;
+                            }
+
+							if (a != null && !a.isEmpty()) {
+							    artist = a;
+                            }
 						}
 					} catch (Exception e) {
 						Log.e("TM-MusicManager", "Error while reading song tags of (" + file.getName() + ")", e);
 					}
 
-                    retriever.setDataSource(file.getAbsolutePath());
                     // TODO: Convert mp3 tag reader to retriever way
-                    long duration = Long.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
-                    long seconds = duration % 60;
-                    long minutes = (duration - seconds) / 60;
-
                     create(new Song(
                         UUID.randomUUID().toString().substring(0, 10),
                         title,
                         artist,
-                        minutes + ":" + (seconds < 10 ? "0" : "") + seconds,
+                        getDuration(file),
                         null,
                         file
                     ), null, false);
@@ -139,6 +146,17 @@ public class MusicManager
         updateCache();
     }
 
+    public synchronized String getDuration(File song)
+    {
+        retriever.setDataSource(song.getAbsolutePath());
+
+        long duration = Long.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
+        long seconds = duration % 60;
+        long minutes = (duration - seconds) / 60;
+
+        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    }
+
     public File getFile(SongToDownload song)
     {
         String file = song.getArtist() + " - " + song.getTitle() + " (" + song.getId() + ").mp3";
@@ -153,7 +171,7 @@ public class MusicManager
             downloaded.getId(),
             downloaded.getTitle(),
             downloaded.getArtist(),
-            "3:21", // TODO
+            getDuration(file),
             null,
             file
         );
@@ -178,6 +196,7 @@ public class MusicManager
         songs.add(song);
 
         if (updateCache) {
+            System.out.println("ON UPDATE CACHE");
             updateCache();
         }
 

@@ -9,6 +9,7 @@ import ImportFromYoutube from "../../components/create-playlist/ImportFromYoutub
 
 export const playlistComponents = [ImportFromYoutube];
 export const routerMode = "history";
+export const shouldAdd = true;
 
 const audio = new Audio();
 audio.volume = (localStorage.getItem("volume") || 100) / 100;

@@ -1,20 +1,20 @@
 import { callbacks } from "./listener";
 
-export function swDownload(getMeta) {
+export function swDownload(/*getMeta*/) {
   return async (music, meta, progressFn) => {
-    const { url } = await (meta || getMeta(music));
+    //const { url } = await (meta || getMeta(music));
 
     // eslint-disable-next-line no-undef
     cordova.exec(() => {}, () => {}, "Thundermusic", "download", [
-      { ...music, artist: music.artist, url }
+      { ...music, artist: music.artist /*, url*/ }
     ]);
 
     await new Promise(resolve => {
       callbacks.downloads[music.id] = progress => {
-        if (progress === -2) {
+        if (progress === -4) {
           resolve();
         } else {
-          progressFn(progress);
+          progressFn(progress / 100);
         }
       };
     });

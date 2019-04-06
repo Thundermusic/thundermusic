@@ -2,10 +2,11 @@
 
 import { musics, callbacks, init } from "./listener";
 
-export async function addMusic(music) {
-  return new Promise((resolve, reject) => {
+export async function addMusic(/*music*/) {
+  return Promise.resolve();
+  /*return new Promise((resolve, reject) => {
     cordova.exec(resolve, reject, "Thundermusic", "download", [music]);
-  });
+  });*/
 }
 
 export async function deleteMusic(id) {

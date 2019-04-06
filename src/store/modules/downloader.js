@@ -1,5 +1,5 @@
 import Vue from "vue";
-import { providers } from "platform";
+import { shouldAdd, providers } from "platform";
 
 export const state = {
   progress: {}
@@ -30,14 +30,16 @@ export const actions = {
       }
     });
 
-    dispatch(
-      "musics/add",
-      {
-        ...music,
-        url
-      },
-      { root: true }
-    );
+    if (shouldAdd) {
+      dispatch(
+        "musics/add",
+        {
+          ...music,
+          url
+        },
+        { root: true }
+      );
+    }
 
     url.catch(err => {
       console.error(err);

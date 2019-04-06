@@ -31,6 +31,10 @@ function listen() {
 
           if (first && callbacks.musics) {
             callbacks.musics();
+          } else {
+            import("../../store").then(store =>
+              store.default.commit("musics/SET_MUSICS", event.songs)
+            );
           }
 
           break;
@@ -41,11 +45,13 @@ function listen() {
               if (s.id === cbId) {
                 song = s;
                 break;
+              } else {
+                console.log('"' + s.id + '" !== ' + '"' + cbId + '"');
               }
             }
 
             if (song == null) {
-              callbacks.downloads[cbId](-2);
+              callbacks.downloads[cbId](-4);
               delete callbacks.downloads[cbId];
             } else {
               callbacks.downloads[cbId](song.progress);

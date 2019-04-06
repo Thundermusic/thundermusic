@@ -10,7 +10,7 @@
                     <v-list-tile-content>
                         <v-list-tile-title class="music-title">{{ music.title }}</v-list-tile-title>
                         <v-list-tile-sub-title class="music-artist text--primary">{{ music.artist }}</v-list-tile-sub-title>
-                        <v-list-tile-sub-title>{{ isDownloading(music) ? 'Téléchargement...' : (hasMusic && hasMusic(music) ? 'Déjà ajoutée' : music.duration || '?') }}</v-list-tile-sub-title>
+                        <v-list-tile-sub-title>{{ isDownloading(music) ? getStatus(music) : (hasMusic && hasMusic(music) ? 'Déjà ajoutée' : music.duration || '?') }}</v-list-tile-sub-title>
                     </v-list-tile-content>
                     <v-progress-linear
                         v-if="isDownloading(music)"
@@ -19,7 +19,7 @@
                         background-color="transparent"
                         height="2"
                         :value="progress[music.id]"
-                        :indeterminate="!progress[music.id]"
+                        :indeterminate="isIndeterminate(music)"
                     ></v-progress-linear>
                     <slot :music="music"></slot>
                 </v-list-tile>
@@ -49,6 +49,21 @@ export default {
   methods: {
     isDownloading(music) {
       return music.id in this.progress;
+    },
+    getStatus(music) {
+      const status = this.progress[music.id];
+
+      if (status === -2) {
+        return "En attente";
+      } else if (status === -1) {
+        return "Conversion...";
+      } else {
+        return "Téléchargement...";
+      }
+    },
+    isIndeterminate(music) {
+      const status = this.progress[music.id];
+      return isNaN(status) || status < 0;
     }
   }
 };
