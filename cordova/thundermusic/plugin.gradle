@@ -15,12 +15,17 @@ android {
 
         def url = properties.getProperty('api.url')
 
+        if (url == null) {
+            throw new IllegalStateException("Missing api.url in local.properties")
+        }
+
         debug {
-            buildConfigField 'String', 'API_URL', url
+            buildConfigField 'String', 'API_URL', '"' + url + '"'
         }
 
         release {
-            buildConfigField 'String', 'API_URL', url
+            buildConfigField 'String', 'API_URL', '"' + url + '"'
         }
     }
 }
+

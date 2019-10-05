@@ -59,7 +59,7 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:name="fr.litarvan.core.ThundermusicService" />
+            <service android:name="fr.litarvan.thundermusic.core.ThundermusicService" />
         </config-file>
     </platform>
 

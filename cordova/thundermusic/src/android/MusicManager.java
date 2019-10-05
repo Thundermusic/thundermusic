@@ -148,7 +148,12 @@ public class MusicManager
 
     public synchronized String getDuration(File song)
     {
-        retriever.setDataSource(song.getAbsolutePath());
+        try {
+            retriever.setDataSource(song.getAbsolutePath());
+        } catch (Exception e) {
+            Log.e("TM-MusicManager", "Could not read sond duration of " + song.getAbsolutePath() + ", skipping");
+            return "0:00";
+        }
 
         long duration = Long.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
         long seconds = duration % 60;
@@ -181,7 +186,7 @@ public class MusicManager
 
     public Song create(Song song, byte[] thumbnail, boolean updateCache) throws Exception
     {
-        System.out.println("mmmh la creation de chanson : " + song.getTitle());
+        Log.i("TM-MusicManager", "New song : " + song.getTitle());
 
         if (updateCache) {
             writeTags(song, thumbnail);
