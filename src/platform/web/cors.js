@@ -1,1 +1,1 @@
-export const CORS_PROXY = "https://cors-now-jlnmhkimym.now.sh/";
+export const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
